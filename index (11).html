@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light only">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Tasks</title>
+<style>
+:root{color-scheme:light;--bg:#ffffff;--card:#f1fbf4;--field:#ffffff;--text:#374151;--muted:#6b7280;--border:#d6eedc;--accent:#15803d;--accent-ink:#fff;--danger:#dc2626;--danger-bg:#fef2f2;--shadow:0 1px 2px rgba(22,101,52,.08),0 2px 6px rgba(22,101,52,.06)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.app{max-width:760px;margin:0 auto;padding:40px 20px 80px}
+h1{margin:0;font-size:32px;letter-spacing:-.025em;line-height:1.15}
+h2{margin:0;font-size:15px;font-weight:650}
+.muted{color:var(--muted)}
+p{margin:0}
+.head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.head .right{display:flex;align-items:center;gap:10px;padding-top:6px}
+.pill{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px 12px;white-space:nowrap}
+.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.progress{padding:16px 18px;margin-bottom:16px}
+.progress .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
+.progress .bar-wrap{display:flex;align-items:center;gap:12px}
+.bar{flex:1;height:8px;border-radius:99px;background:#e5e7eb;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .25s}
+#pct{font-variant-numeric:tabular-nums;font-weight:600;min-width:38px;text-align:right}
+input,select,button{font:inherit;color:inherit}
+input[type=text],input[type=search],input[type=date],select{background:var(--field);border:1px solid var(--border);border-radius:10px;padding:9px 12px;min-height:40px;width:100%}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:9px 16px;min-height:40px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
+.btn.ghost:hover{background:var(--bg)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.icon{background:transparent;border:0;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;color:var(--muted);flex:none}
+.icon:hover{background:var(--bg);color:var(--text)}
+.add{display:grid;grid-template-columns:1fr 120px 130px 150px auto;gap:8px;padding:12px;margin-bottom:16px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
+.tools .search{flex:1 1 200px}
+.tools select{width:auto}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:7px 13px;min-height:38px;cursor:pointer;color:var(--muted);font-size:14px}
+.seg button+button{border-left:1px solid var(--border)}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);font-weight:600}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
+section.group{margin-bottom:26px}
+section.group h2{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.count{font-weight:500;font-size:12px;color:var(--muted);background:var(--border);border-radius:99px;padding:0 8px}
+ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.task{display:flex;align-items:center;gap:12px;padding:12px 10px 12px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
+.task.overdue{border-left:3px solid var(--danger);background:linear-gradient(0deg,var(--danger-bg),var(--danger-bg)),var(--card)}
+.task.done{opacity:.6}
+.task.done .title{text-decoration:line-through}
+.chk{width:22px;height:22px;accent-color:var(--accent);flex:none;cursor:pointer;margin:0}
+.body{flex:1;min-width:0}
+.title{font-weight:550;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted);margin-top:2px}
+.meta:empty{display:none}
+.cat{border:1px solid var(--border);border-radius:99px;padding:0 9px;font-size:12px}
+.late{color:var(--danger);font-weight:600}
+.pri{font-size:13px;flex:none}
+.task.editing{display:grid;grid-template-columns:1fr 115px 125px 145px auto auto;gap:8px;padding:12px}
+.empty-sm{color:var(--muted);font-size:14px;padding:14px;text-align:center;border:1px dashed var(--border);border-radius:12px}
+.empty{text-align:center;padding:56px 16px;color:var(--muted)}
+.empty .big{font-size:40px;line-height:1.2}
+.empty strong{display:block;color:var(--text);font-size:18px;margin-top:6px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media(max-width:720px){
+.app{padding:24px 14px 60px}h1{font-size:26px}
+.add,.task.editing{grid-template-columns:1fr}
+input,select{font-size:16px}
+.btn,.seg button,input,select{min-height:46px}
+.icon{width:44px;height:44px}
+.tools select,.tools .btn{flex:1}
+.filters .seg{width:100%}.filters .seg button{flex:1;padding-inline:6px}
+.task{padding-left:12px}
+}
+@media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<main class="app">
+  <header class="head">
+    <div>
+      <h1>My Tasks</h1>
+      <p id="today" class="muted"></p>
+    </div>
+    <div class="right">
+      <p id="hdrProgress" class="pill" aria-live="polite"></p>
+    </div>
+  </header>
+
+  <section class="card progress" aria-label="Today's progress">
+    <div class="row"><h2>Today's Progress</h2><span id="progText" class="muted"></span></div>
+    <div class="bar-wrap">
+      <div class="bar" id="bar" role="progressbar" aria-label="Completed tasks" aria-valuemin="0" aria-valuemax="100"><i id="barFill"></i></div>
+      <span id="pct"></span>
+    </div>
+  </section>
+
+  <form id="addForm" class="card add" autocomplete="off">
+    <label class="sr" for="newTitle">New task</label>
+    <input type="text" id="newTitle" placeholder="Add a task and press Enter" maxlength="200">
+    <label class="sr" for="newPriority">Priority</label>
+    <select id="newPriority"></select>
+    <label class="sr" for="newCategory">Category</label>
+    <select id="newCategory"></select>
+    <label class="sr" for="newDue">Due date</label>
+    <input type="date" id="newDue">
+    <button class="btn" type="submit">Add Task</button>
+  </form>
+
+  <div class="tools">
+    <label class="sr" for="search">Search tasks</label>
+    <input type="search" id="search" class="search" placeholder="Search tasks...">
+    <label class="sr" for="sort">Sort by</label>
+    <select id="sort">
+      <option value="priority">Sort: Priority</option>
+      <option value="due">Sort: Due date</option>
+      <option value="created">Sort: Created date</option>
+    </select>
+    <button id="clearBtn" class="btn ghost" type="button">Clear completed</button>
+  </div>
+  <div class="filters">
+    <div class="seg" id="statusSeg" role="group" aria-label="Filter by status">
+      <button type="button" data-status="all" aria-pressed="true">All</button>
+      <button type="button" data-status="active" aria-pressed="false">Active</button>
+      <button type="button" data-status="completed" aria-pressed="false">Completed</button>
+    </div>
+    <div class="seg" id="prioritySeg" role="group" aria-label="Filter by priority">
+      <button type="button" data-priority="all" aria-pressed="true">All</button>
+      <button type="button" data-priority="high" aria-pressed="false">🔴 High</button>
+      <button type="button" data-priority="medium" aria-pressed="false">🟡 Medium</button>
+      <button type="button" data-priority="low" aria-pressed="false">🟢 Low</button>
+    </div>
+  </div>
+
+  <div id="list"></div>
+</main>
+
+<script>
+const TASKS_KEY = 'todoTasks';
+const PRIORITIES = {
+  high:   { label: 'High',   icon: '🔴', rank: 0 },
+  medium: { label: 'Medium', icon: '🟡', rank: 1 },
+  low:    { label: 'Low',    icon: '🟢', rank: 2 }
+};
+const CATEGORIES = ['Work', 'Study', 'Project', 'Personal', 'Other'];
+
+let tasks = [];
+let editingId = null;
+const view = { status: 'all', priority: 'all', sort: 'priority', query: '' };
+const $ = (sel, root = document) => root.querySelector(sel);
+
+/* ---------- Helpers ---------- */
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const pad = n => String(n).padStart(2, '0');
+
+// Local date as YYYY-MM-DD (string comparison works for ISO dates)
+function dateString(offsetDays = 0) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+function shortDate(iso) {
+  const [y, m, d] = iso.split('-').map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' });
+}
+const isOverdue = t => !t.completed && t.dueDate && t.dueDate < dateString();
+function dueLabel(t) {
+  if (!t.dueDate) return '';
+  if (isOverdue(t)) return `Overdue, ${shortDate(t.dueDate)}`;
+  if (t.dueDate === dateString()) return 'Due today';
+  if (t.dueDate === dateString(1)) return 'Due tomorrow';
+  return `Due ${shortDate(t.dueDate)}`;
+}
+const priorityOf = p => PRIORITIES[p] || PRIORITIES.medium;
+const options = (items, selected) => items.map(([v, l]) => `<option value="${esc(v)}"${v === selected ? ' selected' : ''}>${esc(l)}</option>`).join('');
+const priorityOptions = sel => options(Object.entries(PRIORITIES).map(([k, p]) => [k, `${p.icon} ${p.label}`]), sel);
+const categoryOptions = sel => options([['', 'No category'], ...CATEGORIES.map(c => [c, c])], sel);
+
+/* ---------- Storage ---------- */
+function loadTasks() {
+  try {
+    const raw = localStorage.getItem(TASKS_KEY);
+    if (raw === null) { // first launch only: seed examples
+      const now = Date.now();
+      tasks = [
+        { id: uid(), title: 'Finish project documentation', completed: false, priority: 'high', category: 'Work', dueDate: dateString(), createdAt: now - 2 },
+        { id: uid(), title: 'Study Kubernetes', completed: false, priority: 'medium', category: 'Study', dueDate: dateString(), createdAt: now - 1 },
+        { id: uid(), title: 'Plan tomorrow', completed: false, priority: 'low', category: 'Personal', dueDate: dateString(1), createdAt: now }
+      ];
+      saveTasks();
+      return;
+    }
+    const parsed = JSON.parse(raw);
+    tasks = Array.isArray(parsed) ? parsed : [];
+  } catch (err) {
+    tasks = [];
+  }
+}
+function saveTasks() {
+  try { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)); } catch (err) { /* storage unavailable */ }
+}
+// Every change: update array (done by caller), save, re-render
+function commit() { saveTasks(); render(); }
+
+/* ---------- Task actions ---------- */
+function addTask() {
+  const input = $('#newTitle');
+  const title = input.value.trim();
+  if (!title) { input.focus(); return; }
+  tasks.push({
+    id: uid(),
+    title,
+    completed: false,
+    priority: $('#newPriority').value,
+    category: $('#newCategory').value,
+    dueDate: $('#newDue').value,
+    createdAt: Date.now()
+  });
+  input.value = '';
+  $('#newDue').value = '';
+  commit();
+  input.focus();
+}
+function editTask(id, changes) {
+  const task = tasks.find(t => t.id === id);
+  if (task) Object.assign(task, changes);
+  editingId = null;
+  commit();
+}
+function deleteTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task || !confirm(`Delete "${task.title}"?`)) return;
+  tasks = tasks.filter(t => t.id !== id);
+  if (editingId === id) editingId = null;
+  commit();
+}
+function toggleTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (task) { task.completed = !task.completed; commit(); }
+}
+function clearCompleted() {
+  if (!tasks.some(t => t.completed)) return;
+  if (!confirm('Delete all completed tasks?')) return;
+  tasks = tasks.filter(t => !t.completed);
+  commit();
+}
+
+/* ---------- Filter, search, sort ---------- */
+function filterTasks(list) {
+  return list.filter(t =>
+    (view.status === 'all' || (view.status === 'completed') === t.completed) &&
+    (view.priority === 'all' || t.priority === view.priority));
+}
+function searchTasks(list) {
+  const q = view.query.trim().toLowerCase();
+  if (!q) return list;
+  return list.filter(t => t.title.toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q));
+}
+function sortTasks(list) {
+  const byPriority = (a, b) => priorityOf(a.priority).rank - priorityOf(b.priority).rank || b.createdAt - a.createdAt;
+  const dueKey = t => t.dueDate || '9999-99-99'; // no date sorts last
+  const comparers = {
+    priority: byPriority,
+    due: (a, b) => dueKey(a).localeCompare(dueKey(b)) || byPriority(a, b),
+    created: (a, b) => b.createdAt - a.createdAt
+  };
+  return [...list].sort(comparers[view.sort]);
+}
+
+/* ---------- Rendering ---------- */
+function taskHTML(t) {
+  if (t.id === editingId) {
+    return `<li class="task editing" data-id="${t.id}">
+      <input type="text" class="e-title" value="${esc(t.title)}" aria-label="Task title" maxlength="200">
+      <select class="e-pri" aria-label="Priority">${priorityOptions(t.priority)}</select>
+      <select class="e-cat" aria-label="Category">${categoryOptions(t.category || '')}</select>
+      <input type="date" class="e-due" value="${esc(t.dueDate || '')}" aria-label="Due date">
+      <button type="button" class="btn save">Save</button>
+      <button type="button" class="btn ghost cancel">Cancel</button>
+    </li>`;
+  }
+  const p = priorityOf(t.priority);
+  const due = dueLabel(t);
+  const classes = ['task', t.completed ? 'done' : '', isOverdue(t) ? 'overdue' : ''].join(' ');
+  return `<li class="${classes}" data-id="${t.id}">
+    <input type="checkbox" class="chk" ${t.completed ? 'checked' : ''} aria-label="Mark &quot;${esc(t.title)}&quot; as ${t.completed ? 'not done' : 'done'}">
+    <div class="body">
+      <div class="title">${esc(t.title)}</div>
+      <div class="meta">${t.category ? `<span class="cat">${esc(t.category)}</span>` : ''}${due ? `<span class="${isOverdue(t) ? 'late' : ''}">${esc(due)}</span>` : ''}</div>
+    </div>
+    <span class="pri" title="${p.label} priority" role="img" aria-label="${p.label} priority">${p.icon}</span>
+    <button type="button" class="icon edit" aria-label="Edit task" title="Edit">✎</button>
+    <button type="button" class="icon del" aria-label="Delete task" title="Delete">🗑</button>
+  </li>`;
+}
+
+function renderTasks() {
+  const list = $('#list');
+  const visible = sortTasks(searchTasks(filterTasks(tasks)));
+  const filtering = view.query.trim() || view.priority !== 'all';
+
+  if (tasks.length === 0) {
+    list.innerHTML = '<div class="empty"><div class="big">🎉</div><strong>Nothing to do!</strong>You\'re all caught up.</div>';
+    return;
+  }
+  if (visible.length === 0 && filtering) {
+    list.innerHTML = '<div class="empty"><div class="big">🔎</div><strong>No tasks found.</strong></div>';
+    return;
+  }
+
+  const today = dateString();
+  const groups = [
+    { name: 'Today', items: visible.filter(t => !t.completed && (!t.dueDate || t.dueDate <= today)), show: view.status !== 'completed' },
+    { name: 'Upcoming', items: visible.filter(t => !t.completed && t.dueDate > today), show: view.status !== 'completed' },
+    { name: 'Completed', items: visible.filter(t => t.completed), show: view.status !== 'active' }
+  ];
+  list.innerHTML = groups.filter(g => g.show).map(g => `
+    <section class="group" aria-label="${g.name}">
+      <h2>${g.name} <span class="count">${g.items.length}</span></h2>
+      ${g.items.length ? `<ul>${g.items.map(taskHTML).join('')}</ul>` : '<p class="empty-sm">No tasks here 🎉</p>'}
+    </section>`).join('');
+}
+
+function renderProgress() {
+  const total = tasks.length;
+  const done = tasks.filter(t => t.completed).length;
+  const pct = total ? Math.round(done / total * 100) : 0;
+  $('#hdrProgress').textContent = `${done} of ${total} completed`;
+  $('#progText').textContent = `${done} / ${total} completed`;
+  $('#pct').textContent = `${pct}%`;
+  $('#barFill').style.width = `${pct}%`;
+  $('#bar').setAttribute('aria-valuenow', pct);
+  $('#clearBtn').disabled = done === 0;
+}
+
+function renderDate() {
+  $('#today').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+}
+function render() { renderTasks(); renderProgress(); }
+
+/* ---------- Events ---------- */
+function startEdit(id) {
+  editingId = id;
+  renderTasks();
+  const input = $('.e-title');
+  if (input) { input.focus(); input.select(); }
+}
+function saveEdit(li) {
+  const title = $('.e-title', li).value.trim();
+  if (!title) { $('.e-title', li).focus(); return; }
+  editTask(li.dataset.id, {
+    title,
+    priority: $('.e-pri', li).value,
+    category: $('.e-cat', li).value,
+    dueDate: $('.e-due', li).value
+  });
+}
+
+const listEl = $('#list');
+listEl.addEventListener('click', e => {
+  const li = e.target.closest('li.task');
+  if (!li) return;
+  const id = li.dataset.id;
+  if (e.target.closest('.edit')) startEdit(id);
+  else if (e.target.closest('.del')) deleteTask(id);
+  else if (e.target.closest('.save')) saveEdit(li);
+  else if (e.target.closest('.cancel')) { editingId = null; renderTasks(); }
+});
+listEl.addEventListener('change', e => {
+  if (e.target.classList.contains('chk')) toggleTask(e.target.closest('li').dataset.id);
+});
+listEl.addEventListener('dblclick', e => {
+  const title = e.target.closest('.title');
+  if (title) startEdit(title.closest('li').dataset.id);
+});
+listEl.addEventListener('keydown', e => {
+  const li = e.target.closest('li.editing');
+  if (!li) return;
+  if (e.key === 'Enter') { e.preventDefault(); saveEdit(li); }
+  if (e.key === 'Escape') { e.stopPropagation(); editingId = null; renderTasks(); }
+});
+
+$('#addForm').addEventListener('submit', e => { e.preventDefault(); addTask(); });
+$('#clearBtn').addEventListener('click', clearCompleted);
+$('#sort').addEventListener('change', e => { view.sort = e.target.value; renderTasks(); });
+$('#search').addEventListener('input', e => { view.query = e.target.value; renderTasks(); });
+
+function bindSegment(id, key, attr) {
+  $(id).addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    view[key] = btn.dataset[attr];
+    $(id).querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', b === btn));
+    renderTasks();
+  });
+}
+bindSegment('#statusSeg', 'status', 'status');
+bindSegment('#prioritySeg', 'priority', 'priority');
+
+document.addEventListener('keydown', e => {
+  const typing = /^(INPUT|SELECT|TEXTAREA)$/.test(document.activeElement.tagName);
+  if (e.key === '/' && !typing) {
+    e.preventDefault();
+    $('#search').focus();
+  } else if (e.key === 'Escape' && (view.query || document.activeElement === $('#search'))) {
+    $('#search').value = '';
+    view.query = '';
+    $('#search').blur();
+    renderTasks();
+  }
+});
+
+// Refresh date-based grouping when returning to the tab (e.g. after midnight)
+window.addEventListener('focus', () => { renderDate(); if (editingId === null) render(); });
+
+/* ---------- Init ---------- */
+$('#newPriority').innerHTML = priorityOptions('medium');
+$('#newCategory').innerHTML = categoryOptions('');
+try { localStorage.removeItem('todoTheme'); } catch (err) { /* ignore */ } // clear old dark setting
+renderDate();
+loadTasks();
+render();
+</script>
+</body>
+</html>
