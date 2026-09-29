@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="color-scheme" content="light only">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>My Tasks</title>
 <style>
 :root{color-scheme:light;--bg:#ffffff;--card:#f1fbf4;--field:#ffffff;--text:#374151;--muted:#6b7280;--border:#d6eedc;--accent:#15803d;--accent-ink:#fff;--danger:#dc2626;--danger-bg:#fef2f2;--shadow:0 1px 2px rgba(22,101,52,.08),0 2px 6px rgba(22,101,52,.06)}
@@ -75,6 +75,13 @@ input,select{font-size:16px}
 .filters .seg{width:100%}.filters .seg button{flex:1;padding-inline:6px}
 .task{padding-left:12px}
 }
+dialog{border:1px solid var(--border);border-radius:14px;background:var(--bg);color:var(--text);padding:20px;width:min(340px,90vw);box-shadow:0 10px 30px rgba(22,101,52,.18)}
+dialog::backdrop{background:rgba(107,114,128,.35)}
+dialog .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
+.btn.small{min-height:32px;padding:4px 12px;font-size:13px}
+.btn.danger{background:var(--danger);color:#fff}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-reduced-motion:reduce){.bar i{transition:none}}
 </style>
 </head>
@@ -84,8 +91,10 @@ input,select{font-size:16px}
     <div>
       <h1>My Tasks</h1>
       <p id="today" class="muted"></p>
+      <p id="sync" class="muted" style="font-size:13px" aria-live="polite">Connecting…</p>
     </div>
     <div class="right">
+      <button id="ghBtn" class="btn ghost small" type="button">Connect storage</button>
       <p id="hdrProgress" class="pill" aria-live="polite"></p>
     </div>
   </header>
@@ -136,10 +145,32 @@ input,select{font-size:16px}
   </div>
 
   <div id="list"></div>
+  <dialog id="ghDlg" aria-labelledby="ghTitle">
+    <form id="ghForm">
+      <h2 id="ghTitle">Connect your JSON storage</h2>
+      <p class="muted" style="margin:8px 0 12px">Your tasks are stored as one JSON file in a GitHub repo you own. Any device with these details stays in sync. Do this once per device.</p>
+      <label class="sr" for="ghOwner">GitHub username</label>
+      <input type="text" id="ghOwner" placeholder="GitHub username" autocomplete="off">
+      <label class="sr" for="ghRepo">Repository name</label>
+      <input type="text" id="ghRepo" placeholder="Repository name" autocomplete="off" style="margin-top:8px">
+      <label class="sr" for="ghToken">Personal access token</label>
+      <input type="password" id="ghToken" placeholder="Personal access token (repo scope)" autocomplete="off" style="margin-top:8px">
+      <p id="ghMsg" class="muted" style="margin-top:8px;font-size:13px" aria-live="polite"></p>
+      <div class="actions"><button type="button" class="btn ghost" id="ghDisconnect" hidden>Disconnect</button><button class="btn" type="submit">Connect</button></div>
+    </form>
+  </dialog>
+  <dialog id="confirm" aria-labelledby="confirmMsg">
+    <form method="dialog">
+      <p id="confirmMsg"></p>
+      <div class="actions"><button class="btn ghost" value="cancel">Cancel</button><button class="btn danger" id="confirmOk" value="ok">Delete</button></div>
+    </form>
+  </dialog>
 </main>
 
 <script>
 const TASKS_KEY = 'todoTasks';
+const UPDATED_KEY = 'todoUpdatedAt';
+const SYNC_ID_KEY = 'todoSyncId';
 const PRIORITIES = {
   high:   { label: 'High',   icon: '🔴', rank: 0 },
   medium: { label: 'Medium', icon: '🟡', rank: 1 },
@@ -180,38 +211,236 @@ const options = (items, selected) => items.map(([v, l]) => `<option value="${esc
 const priorityOptions = sel => options(Object.entries(PRIORITIES).map(([k, p]) => [k, `${p.icon} ${p.label}`]), sel);
 const categoryOptions = sel => options([['', 'No category'], ...CATEGORIES.map(c => [c, c])], sel);
 
-/* ---------- Storage ---------- */
+/* ---------- Storage: local cache + cloud sync ---------- */
+let cloud = null;      // { col } once the synced database is connected
+const pending = {};    // per-document write queue (one write at a time)
+
+function sampleTasks() {
+  const now = Date.now();
+  return [
+    { id: uid(), title: 'Finish project documentation', completed: false, priority: 'high', category: 'Work', dueDate: dateString(), createdAt: now - 2 },
+    { id: uid(), title: 'Study Kubernetes', completed: false, priority: 'medium', category: 'Study', dueDate: dateString(), createdAt: now - 1 },
+    { id: uid(), title: 'Plan tomorrow', completed: false, priority: 'low', category: 'Personal', dueDate: dateString(1), createdAt: now }
+  ];
+}
+// Returns true if this device already had saved tasks
 function loadTasks() {
   try {
     const raw = localStorage.getItem(TASKS_KEY);
-    if (raw === null) { // first launch only: seed examples
-      const now = Date.now();
-      tasks = [
-        { id: uid(), title: 'Finish project documentation', completed: false, priority: 'high', category: 'Work', dueDate: dateString(), createdAt: now - 2 },
-        { id: uid(), title: 'Study Kubernetes', completed: false, priority: 'medium', category: 'Study', dueDate: dateString(), createdAt: now - 1 },
-        { id: uid(), title: 'Plan tomorrow', completed: false, priority: 'low', category: 'Personal', dueDate: dateString(1), createdAt: now }
-      ];
-      saveTasks();
-      return;
+    if (raw !== null) {
+      const parsed = JSON.parse(raw);
+      tasks = Array.isArray(parsed) ? parsed : [];
+      return true;
     }
-    const parsed = JSON.parse(raw);
-    tasks = Array.isArray(parsed) ? parsed : [];
+  } catch (err) { tasks = []; }
+  return false;
+}
+function saveTasks(touch = true) {
+  try {
+    localStorage.setItem(TASKS_KEY, JSON.stringify(tasks));
+    if (touch) localStorage.setItem(UPDATED_KEY, String(Date.now()));
+  } catch (err) { /* storage unavailable */ }
+}
+const setSync = text => { $('#sync').textContent = text; };
+
+function queueWrite(id, op) {
+  pending[id] = (pending[id] || Promise.resolve()).then(op)
+    .then(() => setSync('☁ Synced'), () => setSync('⚠ Sync problem. Saved on this device.'));
+}
+// Every change: save locally, re-render, then send changes to the cloud
+function commit(changed = [], removedIds = []) {
+  saveTasks();
+  render();
+  if (gh) schedulePush();
+  if (!cloud) return;
+  changed.forEach(t => { const copy = { ...t }; queueWrite(t.id, () => cloud.col.doc(copy.id).set(copy)); });
+  removedIds.forEach(id => queueWrite(id, () => cloud.col.doc(id).delete()));
+}
+
+// Live updates from other devices
+function applySnapshot(snap) {
+  if (snap.metadata.fromCache && snap.empty) return; // wait for the definitive result
+  tasks = snap.docs.map(d => ({ ...d.data(), id: d.id }));
+  saveTasks();
+  if (editingId && !tasks.some(t => t.id === editingId)) editingId = null;
+  if (editingId === null) renderTasks(); // don't disturb an open inline edit
+  renderProgress();
+}
+
+async function initCloud(hadLocal) {
+  try {
+    if (!window.claude) throw new Error('not hosted');
+    const [db, user] = await Promise.all([claude.use('db'), claude.use('user')]);
+    const uid = user ? await user.id() : null;
+    if (!db || !uid) throw new Error('sync unavailable');
+    const profile = db.doc(`data/users/${uid}/profile`);
+    const col = profile.collection('tasks');
+    const meta = await profile.get();
+    if (!(meta.exists && meta.data().seeded)) {
+      // First time on this account: upload this device's tasks (or samples)
+      const start = tasks.length ? tasks : (hadLocal ? [] : sampleTasks());
+      for (const t of start) await col.doc(t.id).set(t);
+      await profile.set({ seeded: true });
+    }
+    cloud = { col };
+    col.onSnapshot(applySnapshot, () => { cloud = null; setSync('Saved on this device only'); });
+    setSync('☁ Synced');
   } catch (err) {
-    tasks = [];
+    cloud = null;
+    setSync('Saved on this device only');
+    initSync();
   }
 }
-function saveTasks() {
-  try { localStorage.setItem(TASKS_KEY, JSON.stringify(tasks)); } catch (err) { /* storage unavailable */ }
+
+/* ---------- Sync: tasks.json stored in a GitHub repo you own ---------- */
+// The whole task list is one JSON file in your repo. Any device with the
+// same repo + token reads and writes that same file, so it stays in sync.
+const GH_KEY = 'todoGithub';       // { owner, repo, token, path, branch }
+const GH_PATH = 'tasks.json';
+const GH_BRANCH = 'main';
+let gh = null, ghSha = null, pushTimer = null;
+
+const readKey = k => { try { return localStorage.getItem(k); } catch (err) { return null; } };
+const writeKey = (k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (err) { /* ignore */ } };
+const b64encode = obj => btoa(unescape(encodeURIComponent(JSON.stringify(obj, null, 2))));
+const b64decode = str => JSON.parse(decodeURIComponent(escape(atob(str.replace(/\n/g, '')))));
+
+function loadGithubConfig() {
+  try { gh = JSON.parse(readKey(GH_KEY) || 'null'); } catch (err) { gh = null; }
 }
-// Every change: update array (done by caller), save, re-render
-function commit() { saveTasks(); render(); }
+function ghFileUrl(withRef) {
+  const ref = withRef ? `?ref=${gh.branch}` : '';
+  return `https://api.github.com/repos/${gh.owner}/${gh.repo}/contents/${gh.path}${ref}`;
+}
+function ghHeaders() {
+  return { Authorization: `token ${gh.token}`, Accept: 'application/vnd.github+json', 'Content-Type': 'application/json' };
+}
+
+// Reads the file; returns { updatedAt, tasks } or null if it does not exist yet
+async function ghRead() {
+  const res = await fetch(ghFileUrl(true), { headers: ghHeaders(), cache: 'no-store' });
+  if (res.status === 404) { ghSha = null; return null; }
+  if (res.status === 401 || res.status === 403) throw new Error('auth');
+  if (!res.ok) throw new Error('server');
+  const json = await res.json();
+  ghSha = json.sha;
+  try { return b64decode(json.content); } catch (err) { return null; }
+}
+// Writes the file (creates it the first time)
+async function ghWrite(doc) {
+  const body = { message: 'Update tasks', content: b64encode(doc), branch: gh.branch };
+  if (ghSha) body.sha = ghSha;
+  const res = await fetch(ghFileUrl(false), { method: 'PUT', headers: ghHeaders(), body: JSON.stringify(body) });
+  if (res.status === 401 || res.status === 403) throw new Error('auth');
+  if (!res.ok) throw new Error('server');
+  const json = await res.json();
+  ghSha = json.content.sha;
+}
+
+function schedulePush() {
+  if (!gh) return;
+  clearTimeout(pushTimer);
+  pushTimer = setTimeout(async () => {
+    pushTimer = null;
+    try {
+      const updatedAt = Date.now();
+      writeKey(UPDATED_KEY, String(updatedAt));
+      await ghWrite({ updatedAt, tasks });
+      setSync('☁ Synced');
+    } catch (err) { setSync('⚠ Sync problem. Saved on this device.'); }
+  }, 600);
+}
+function seedIfFirstRun() {
+  if (!hadLocal && tasks.length === 0) { tasks = sampleTasks(); saveTasks(false); render(); }
+}
+// Compares this device with the file; the newer side wins
+async function syncNow() {
+  const remote = await ghRead();
+  if (remote === null) { // file does not exist yet: create it from this device
+    seedIfFirstRun();
+    await ghWrite({ updatedAt: Number(readKey(UPDATED_KEY)) || Date.now(), tasks });
+  } else {
+    const localTime = Number(readKey(UPDATED_KEY)) || 0;
+    if (remote.updatedAt > localTime) {
+      tasks = Array.isArray(remote.tasks) ? remote.tasks : [];
+      writeKey(UPDATED_KEY, String(remote.updatedAt));
+      saveTasks(false);
+      render();
+    } else if (remote.updatedAt < localTime) schedulePush();
+  }
+  setSync('☁ Synced');
+}
+function pullSync() {
+  if (!gh || pushTimer || editingId !== null) return;
+  syncNow().catch(err => setSync(err.message === 'auth' ? '⚠ Check your token' : '⚠ Sync problem. Saved on this device.'));
+}
+async function initSync() {
+  loadGithubConfig();
+  if (!gh) { setSync('Saved on this device only'); return; }
+  $('#ghBtn').textContent = 'Storage connected';
+  try { await syncNow(); }
+  catch (err) {
+    seedIfFirstRun();
+    setSync(err.message === 'auth' ? '⚠ Check your token' : '⚠ Could not reach GitHub. Saved on this device.');
+  }
+}
+setInterval(pullSync, 15000);
+window.addEventListener('focus', pullSync);
+
+function openGithubDialog() {
+  loadGithubConfig();
+  $('#ghMsg').textContent = '';
+  $('#ghOwner').value = gh ? gh.owner : '';
+  $('#ghRepo').value = gh ? gh.repo : '';
+  $('#ghToken').value = '';
+  $('#ghDisconnect').hidden = !gh;
+  $('#ghDlg').showModal();
+}
+async function connectGithub(e) {
+  e.preventDefault();
+  const owner = $('#ghOwner').value.trim();
+  const repo = $('#ghRepo').value.trim();
+  const token = $('#ghToken').value.trim();
+  const msg = $('#ghMsg');
+  if (!owner || !repo || !token) { msg.textContent = 'Please fill in all three fields.'; return; }
+  msg.textContent = 'Connecting…';
+  const previous = gh;
+  gh = { owner, repo, token, path: GH_PATH, branch: GH_BRANCH };
+  try {
+    await syncNow();
+    writeKey(GH_KEY, JSON.stringify(gh));
+    $('#ghDlg').close();
+  } catch (err) {
+    gh = previous;
+    msg.textContent = err.message === 'auth'
+      ? 'That token or repo could not be accessed. Check the repo name and token permissions.'
+      : 'Could not reach GitHub. Check your connection and try again.';
+  }
+}
+function disconnectGithub() {
+  gh = null; writeKey(GH_KEY, null);
+  $('#ghBtn').textContent = 'Connect storage';
+  setSync('Saved on this device only');
+  $('#ghDlg').close();
+}
 
 /* ---------- Task actions ---------- */
+// Small in-page confirmation (works everywhere, unlike window.confirm)
+function ask(message, okLabel) {
+  return new Promise(resolve => {
+    const dlg = $('#confirm');
+    $('#confirmMsg').textContent = message;
+    $('#confirmOk').textContent = okLabel;
+    dlg.returnValue = 'cancel';
+    dlg.onclose = () => resolve(dlg.returnValue === 'ok');
+    dlg.showModal();
+  });
+}
 function addTask() {
   const input = $('#newTitle');
   const title = input.value.trim();
   if (!title) { input.focus(); return; }
-  tasks.push({
+  const task = {
     id: uid(),
     title,
     completed: false,
@@ -219,34 +448,35 @@ function addTask() {
     category: $('#newCategory').value,
     dueDate: $('#newDue').value,
     createdAt: Date.now()
-  });
+  };
+  tasks.push(task);
   input.value = '';
   $('#newDue').value = '';
-  commit();
+  commit([task]);
   input.focus();
 }
 function editTask(id, changes) {
   const task = tasks.find(t => t.id === id);
   if (task) Object.assign(task, changes);
   editingId = null;
-  commit();
+  commit(task ? [task] : []);
 }
-function deleteTask(id) {
+async function deleteTask(id) {
   const task = tasks.find(t => t.id === id);
-  if (!task || !confirm(`Delete "${task.title}"?`)) return;
+  if (!task || !(await ask(`Delete "${task.title}"?`, 'Delete'))) return;
   tasks = tasks.filter(t => t.id !== id);
   if (editingId === id) editingId = null;
-  commit();
+  commit([], [id]);
 }
 function toggleTask(id) {
   const task = tasks.find(t => t.id === id);
-  if (task) { task.completed = !task.completed; commit(); }
+  if (task) { task.completed = !task.completed; commit([task]); }
 }
-function clearCompleted() {
-  if (!tasks.some(t => t.completed)) return;
-  if (!confirm('Delete all completed tasks?')) return;
+async function clearCompleted() {
+  const ids = tasks.filter(t => t.completed).map(t => t.id);
+  if (!ids.length || !(await ask('Delete all completed tasks?', 'Delete all'))) return;
   tasks = tasks.filter(t => !t.completed);
-  commit();
+  commit([], ids);
 }
 
 /* ---------- Filter, search, sort ---------- */
@@ -384,6 +614,9 @@ listEl.addEventListener('keydown', e => {
   if (e.key === 'Escape') { e.stopPropagation(); editingId = null; renderTasks(); }
 });
 
+$('#ghBtn').addEventListener('click', openGithubDialog);
+$('#ghForm').addEventListener('submit', connectGithub);
+$('#ghDisconnect').addEventListener('click', disconnectGithub);
 $('#addForm').addEventListener('submit', e => { e.preventDefault(); addTask(); });
 $('#clearBtn').addEventListener('click', clearCompleted);
 $('#sort').addEventListener('change', e => { view.sort = e.target.value; renderTasks(); });
@@ -422,8 +655,9 @@ $('#newPriority').innerHTML = priorityOptions('medium');
 $('#newCategory').innerHTML = categoryOptions('');
 try { localStorage.removeItem('todoTheme'); } catch (err) { /* ignore */ } // clear old dark setting
 renderDate();
-loadTasks();
+const hadLocal = loadTasks();
 render();
+initCloud(hadLocal);
 </script>
 </body>
 </html>
