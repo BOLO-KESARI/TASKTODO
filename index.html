@@ -4,69 +4,94 @@
 <meta charset="utf-8">
 <meta name="color-scheme" content="light only">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>My Tasks</title>
+<title>taskctl</title>
+<link rel="icon" type="image/png" href="https://static0.howtogeekimages.com/wordpress/wp-content/uploads/2025/04/tux-wearing-a-fedora-holding-a-to-do-list-1.png?w=1600&h=900&fit=crop">
 <style>
-:root{color-scheme:light;--bg:#ffffff;--card:#f1fbf4;--field:#ffffff;--text:#374151;--muted:#6b7280;--border:#d6eedc;--accent:#15803d;--accent-ink:#fff;--danger:#dc2626;--danger-bg:#fef2f2;--shadow:0 1px 2px rgba(22,101,52,.08),0 2px 6px rgba(22,101,52,.06)}
+:root{
+  color-scheme:dark;
+  --bg:#101114;--bg-raised:#17181c;--card:#17181c;--field:#17181c;
+  --text:#E4E6EA;--muted:#8A8D94;--border:#2A2D33;
+  --accent:#A3BE8C;--accent-ink:#101114;
+  --danger:#D97975;--danger-bg:#231716;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"Cascadia Code","Liberation Mono",monospace;
+  --shadow:none
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased}
-.app{max-width:760px;margin:0 auto;padding:40px 20px 80px}
-h1{margin:0;font-size:32px;letter-spacing:-.025em;line-height:1.15}
-h2{margin:0;font-size:15px;font-weight:650}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.55 var(--mono);-webkit-font-smoothing:antialiased}
+.app{max-width:740px;margin:0 auto;padding:36px 20px 80px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{flex:none;border-radius:7px}
+h1{margin:0;font-size:19px;font-weight:600;letter-spacing:.01em;line-height:1.2;font-family:var(--mono)}
+h2{margin:0;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
 .muted{color:var(--muted)}
 p{margin:0}
 .head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
 .head .right{display:flex;align-items:center;gap:10px;padding-top:6px}
-.pill{font-size:13px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:999px;padding:4px 12px;white-space:nowrap}
-.card{background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:var(--shadow)}
+.pill{font-size:12px;color:var(--muted);background:var(--bg-raised);border:1px solid var(--border);border-radius:4px;padding:4px 10px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.card{background:var(--card);border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow)}
 .progress{padding:16px 18px;margin-bottom:16px}
 .progress .row{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}
 .progress .bar-wrap{display:flex;align-items:center;gap:12px}
-.bar{flex:1;height:8px;border-radius:99px;background:#e5e7eb;overflow:hidden}
-.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:99px;transition:width .25s}
+.bar{flex:1;height:6px;border-radius:2px;background:var(--border);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);border-radius:2px;transition:width .2s}
 #pct{font-variant-numeric:tabular-nums;font-weight:600;min-width:38px;text-align:right}
 input,select,button{font:inherit;color:inherit}
-input[type=text],input[type=search],input[type=date],select{background:var(--field);border:1px solid var(--border);border-radius:10px;padding:9px 12px;min-height:40px;width:100%}
-input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
-.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:10px;padding:9px 16px;min-height:40px;font-weight:600;cursor:pointer;white-space:nowrap}
-.btn:hover{filter:brightness(1.08)}
+input[type=text],input[type=search],input[type=date],select{background:var(--field);border:1px solid var(--border);border-radius:5px;padding:8px 11px;min-height:38px;width:100%}
+input::placeholder{color:var(--muted)}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:1.5px solid var(--accent);outline-offset:1px}
+.btn{background:var(--accent);color:var(--accent-ink);border:0;border-radius:5px;padding:8px 15px;min-height:38px;font-weight:600;font-family:var(--mono);cursor:pointer;white-space:nowrap}
+.btn:hover{filter:brightness(1.1)}
 .btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
-.btn.ghost:hover{background:var(--bg)}
-.btn:disabled{opacity:.45;cursor:not-allowed}
-.icon{background:transparent;border:0;border-radius:8px;width:36px;height:36px;cursor:pointer;font-size:16px;color:var(--muted);flex:none}
-.icon:hover{background:var(--bg);color:var(--text)}
-.add{display:grid;grid-template-columns:1fr 120px 130px 150px auto;gap:8px;padding:12px;margin-bottom:16px}
+.btn.ghost:hover{background:var(--bg-raised);border-color:#3a3d44}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.icon{background:transparent;border:0;border-radius:4px;width:34px;height:34px;cursor:pointer;font-size:15px;color:var(--muted);flex:none}
+.icon:hover{background:var(--bg-raised);color:var(--text)}
+.add{display:grid;grid-template-columns:1fr 108px 118px 138px auto;gap:8px;padding:12px;margin-bottom:16px}
 .tools{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:8px}
 .tools .search{flex:1 1 200px}
 .tools select{width:auto}
-.seg{display:inline-flex;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--card)}
-.seg button{border:0;background:transparent;padding:7px 13px;min-height:38px;cursor:pointer;color:var(--muted);font-size:14px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:5px;overflow:hidden;background:var(--card)}
+.seg button{border:0;background:transparent;padding:7px 12px;min-height:36px;cursor:pointer;color:var(--muted);font-size:13px;font-family:var(--mono)}
 .seg button+button{border-left:1px solid var(--border)}
 .seg button[aria-pressed=true]{background:var(--accent);color:var(--accent-ink);font-weight:600}
 .filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:24px}
 section.group{margin-bottom:26px}
 section.group h2{display:flex;align-items:center;gap:8px;margin-bottom:10px}
-.count{font-weight:500;font-size:12px;color:var(--muted);background:var(--border);border-radius:99px;padding:0 8px}
-ul{list-style:none;margin:0;padding:0;display:grid;gap:8px}
-.task{display:flex;align-items:center;gap:12px;padding:12px 10px 12px 16px;background:var(--card);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow)}
-.task.overdue{border-left:3px solid var(--danger);background:linear-gradient(0deg,var(--danger-bg),var(--danger-bg)),var(--card)}
-.task.done{opacity:.6}
+.count{font-weight:500;font-size:11px;color:var(--muted);background:var(--bg-raised);border:1px solid var(--border);border-radius:3px;padding:0 7px}
+ul{list-style:none;margin:0;padding:0;border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.task{display:flex;align-items:center;gap:11px;padding:9px 12px;background:var(--card);border-bottom:1px solid var(--border)}
+li.task:last-child{border-bottom:0}
+.task:hover{background:var(--bg-raised)}
+.task.overdue{border-left:2px solid var(--danger)}
+.task.done{opacity:.5}
 .task.done .title{text-decoration:line-through}
-.chk{width:22px;height:22px;accent-color:var(--accent);flex:none;cursor:pointer;margin:0}
+.chk{width:16px;height:16px;accent-color:var(--accent);flex:none;cursor:pointer;margin:0}
+.ticon-wrap{flex:none;width:14px;height:14px;display:flex;align-items:center;justify-content:center;color:var(--muted)}
+.task.done .ticon-wrap{opacity:.5}
+.hintrow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin:-10px 0 16px;padding-left:2px}
+.hintrow .hint{font-size:11px}
+.datechips{display:flex;gap:6px}
+.chip{background:transparent;border:1px solid var(--border);color:var(--muted);border-radius:4px;padding:3px 9px;font-size:11px;font-family:var(--mono);cursor:pointer;min-height:auto}
+.chip:hover{border-color:var(--accent);color:var(--text)}
+.chip[aria-pressed=true]{border-color:var(--accent);color:var(--accent)}
 .body{flex:1;min-width:0}
-.title{font-weight:550;overflow-wrap:anywhere}
-.meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:13px;color:var(--muted);margin-top:2px}
+.title{font-weight:500;overflow-wrap:anywhere;font-size:14px}
+.meta{display:flex;flex-wrap:wrap;gap:4px 10px;font-size:12px;color:var(--muted);margin-top:1px}
 .meta:empty{display:none}
-.cat{border:1px solid var(--border);border-radius:99px;padding:0 9px;font-size:12px}
+.cat{border:1px solid var(--border);border-radius:3px;padding:0 7px}
 .late{color:var(--danger);font-weight:600}
-.pri{font-size:13px;flex:none}
-.task.editing{display:grid;grid-template-columns:1fr 115px 125px 145px auto auto;gap:8px;padding:12px}
-.empty-sm{color:var(--muted);font-size:14px;padding:14px;text-align:center;border:1px dashed var(--border);border-radius:12px}
-.empty{text-align:center;padding:56px 16px;color:var(--muted)}
-.empty .big{font-size:40px;line-height:1.2}
-.empty strong{display:block;color:var(--text);font-size:18px;margin-top:6px}
+.pri{font-size:12px;flex:none;line-height:1}
+.pri-high{color:#D97975}
+.pri-medium{color:#D9B36A}
+.pri-low{color:var(--accent)}
+.task.editing{display:grid;grid-template-columns:1fr 115px 125px 145px auto auto;gap:8px;padding:10px 12px;background:var(--bg-raised)}
+.empty-sm{color:var(--muted);font-size:13px;padding:13px;text-align:center;border:1px dashed var(--border);border-radius:6px}
+.empty{text-align:center;padding:52px 16px;color:var(--muted)}
+.empty .big{font-size:28px;line-height:1.2;font-family:var(--mono)}
+.empty strong{display:block;color:var(--text);font-size:15px;margin-top:8px;font-weight:600}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
 @media(max-width:720px){
-.app{padding:24px 14px 60px}h1{font-size:26px}
+.app{padding:24px 14px 60px}
 .add,.task.editing{grid-template-columns:1fr}
 input,select{font-size:16px}
 .btn,.seg button,input,select{min-height:46px}
@@ -75,11 +100,25 @@ input,select{font-size:16px}
 .filters .seg{width:100%}.filters .seg button{flex:1;padding-inline:6px}
 .task{padding-left:12px}
 }
-dialog{border:1px solid var(--border);border-radius:14px;background:var(--bg);color:var(--text);padding:20px;width:min(340px,90vw);box-shadow:0 10px 30px rgba(22,101,52,.18)}
-dialog::backdrop{background:rgba(107,114,128,.35)}
+dialog{border:1px solid var(--border);border-radius:8px;background:var(--bg-raised);color:var(--text);padding:20px;width:min(340px,90vw);box-shadow:0 12px 28px rgba(0,0,0,.45)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
 dialog .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .btn.small{min-height:32px;padding:4px 12px;font-size:13px}
-.btn.danger{background:var(--danger);color:#fff}
+.btn.danger{background:var(--danger);color:#101114}
+.emo{flex:none;width:28px;height:28px;border:0;border-radius:4px;background:transparent;cursor:pointer;font-size:15px;line-height:1;padding:0;color:var(--muted)}
+.emo:hover{background:var(--border)}
+.task.done .emo{opacity:.5}
+.desc{font-size:12px;color:var(--muted);overflow-wrap:anywhere}
+.roll{color:var(--accent)}
+.task.editing .e-desc{grid-column:1/-1}
+.egrid{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin:12px 0}
+.egrid button{background:transparent;border:1px solid transparent;border-radius:4px;font-size:18px;height:36px;cursor:pointer;padding:0}
+.egrid button:hover{border-color:var(--accent);background:var(--card)}
+.erow{display:flex;gap:8px}
+.toasts{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:6px;z-index:20;width:min(460px,92vw);pointer-events:none}
+.toast{background:var(--bg-raised);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:5px;padding:8px 12px;font-size:12px;color:var(--muted);box-shadow:0 6px 18px rgba(0,0,0,.4)}
+.set{display:flex;gap:10px;align-items:flex-start;margin-top:12px;cursor:pointer}
+.set input{accent-color:var(--accent);width:16px;height:16px;margin:2px 0 0;flex:none}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-reduced-motion:reduce){.bar i{transition:none}}
@@ -89,11 +128,19 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 <main class="app">
   <header class="head">
     <div>
-      <h1>My Tasks</h1>
-      <p id="today" class="muted"></p>
-      <p id="sync" class="muted" style="font-size:13px" aria-live="polite">Connecting…</p>
+      <div class="brand">
+        <svg class="mark" width="26" height="26" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="taskctl">
+          <rect x="1" y="1" width="62" height="62" rx="14" fill="#101114" stroke="#2A2D33" stroke-width="1.5"/>
+          <path d="M16 33.5 L26.5 44 L40 26" fill="none" stroke="#A3BE8C" stroke-width="5" stroke-linecap="square" stroke-linejoin="miter"/>
+          <rect x="40" y="26" width="8" height="18" fill="#A3BE8C"/>
+        </svg>
+        <h1>taskctl</h1>
+      </div>
+      <p id="today" class="muted" style="margin-top:6px"></p>
+      <p id="sync" class="muted" style="font-size:12px" aria-live="polite">Connecting…</p>
     </div>
     <div class="right">
+      <button type="button" id="settingsBtn" class="icon" aria-label="Settings" title="Settings">⚙</button>
       <p id="hdrProgress" class="pill" aria-live="polite"></p>
     </div>
   </header>
@@ -108,7 +155,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
 
   <form id="addForm" class="card add" autocomplete="off">
     <label class="sr" for="newTitle">New task</label>
-    <input type="text" id="newTitle" placeholder="Add a task and press Enter" maxlength="200">
+    <input type="text" id="newTitle" placeholder="Add a task…" maxlength="200">
     <label class="sr" for="newPriority">Priority</label>
     <select id="newPriority"></select>
     <label class="sr" for="newCategory">Category</label>
@@ -117,10 +164,19 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
     <input type="date" id="newDue">
     <button class="btn" type="submit">Add Task</button>
   </form>
+  <div class="hintrow">
+    <p class="muted hint">n new task · / search · esc clear</p>
+    <div class="datechips" role="group" aria-label="Quick due date">
+      <button type="button" class="chip" data-when="today">Today</button>
+      <button type="button" class="chip" data-when="tomorrow">Tomorrow</button>
+      <button type="button" class="chip" data-when="week">+7d</button>
+      <button type="button" class="chip" data-when="none">None</button>
+    </div>
+  </div>
 
   <div class="tools">
     <label class="sr" for="search">Search tasks</label>
-    <input type="search" id="search" class="search" placeholder="Search tasks...">
+    <input type="search" id="search" class="search" placeholder="Search ( / )">
     <label class="sr" for="sort">Sort by</label>
     <select id="sort">
       <option value="priority">Sort: Priority</option>
@@ -137,9 +193,9 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
     </div>
     <div class="seg" id="prioritySeg" role="group" aria-label="Filter by priority">
       <button type="button" data-priority="all" aria-pressed="true">All</button>
-      <button type="button" data-priority="high" aria-pressed="false">🔴 High</button>
-      <button type="button" data-priority="medium" aria-pressed="false">🟡 Medium</button>
-      <button type="button" data-priority="low" aria-pressed="false">🟢 Low</button>
+      <button type="button" data-priority="high" aria-pressed="false">● High</button>
+      <button type="button" data-priority="medium" aria-pressed="false">● Medium</button>
+      <button type="button" data-priority="low" aria-pressed="false">● Low</button>
     </div>
   </div>
 
@@ -154,6 +210,25 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
       <div class="actions"><button class="btn" type="submit">Unlock</button></div>
     </form>
   </dialog>
+  <dialog id="settingsDlg" aria-labelledby="setTitle">
+    <form method="dialog">
+      <h2 id="setTitle">Settings</h2>
+      <label class="set"><input type="checkbox" id="optRollover"><span>Auto-rollover<br><span class="muted" style="font-size:12px">Move unfinished tasks to today once their due date has passed. Completed tasks are never moved.</span></span></label>
+      <div class="actions"><button class="btn ghost" value="close">Close</button></div>
+    </form>
+  </dialog>
+  <dialog id="emojiDlg" aria-labelledby="emoTitle">
+    <h2 id="emoTitle">Task emoji</h2>
+    <div class="egrid" id="egrid"></div>
+    <form id="eForm" class="erow" autocomplete="off">
+      <label class="sr" for="eCustom">Custom emoji</label>
+      <input type="text" id="eCustom" placeholder="Or type any emoji" maxlength="16">
+      <button class="btn small" type="submit">Set</button>
+    </form>
+    <p id="eMsg" class="muted" style="font-size:12px;margin-top:6px" aria-live="polite"></p>
+    <div class="actions"><button type="button" class="btn ghost small" id="eNone">None</button><button type="button" class="btn ghost small" id="eAuto">Auto</button><button type="button" class="btn small" id="eClose">Close</button></div>
+  </dialog>
+  <div class="toasts" id="toasts" role="status" aria-live="polite"></div>
   <dialog id="confirm" aria-labelledby="confirmMsg">
     <form method="dialog">
       <p id="confirmMsg"></p>
@@ -167,11 +242,64 @@ const TASKS_KEY = 'todoTasks';
 const UPDATED_KEY = 'todoUpdatedAt';
 const SYNC_ID_KEY = 'todoSyncId';
 const PRIORITIES = {
-  high:   { label: 'High',   icon: '🔴', rank: 0 },
-  medium: { label: 'Medium', icon: '🟡', rank: 1 },
-  low:    { label: 'Low',    icon: '🟢', rank: 2 }
+  high:   { label: 'High',   icon: '●', cls: 'pri-high',   rank: 0 },
+  medium: { label: 'Medium', icon: '●', cls: 'pri-medium', rank: 1 },
+  low:    { label: 'Low',    icon: '●', cls: 'pri-low',    rank: 2 }
 };
 const CATEGORIES = ['Work', 'Study', 'Project', 'Personal', 'Other'];
+
+// Auto-assigned task emoji: keyword matching on title (weight 2) + description (weight 1),
+// category as a fallback, then a default. Stored on the task (emoji + emojiSource) so it is
+// consistent everywhere and synced. emojiSource 'manual' (incl. emoji '' = removed) is never overwritten.
+const DEFAULT_EMOJI = '📌';
+const CATEGORY_EMOJI = { Work: '💼', Study: '📚', Project: '🚀' };
+const EMOJI_RULES = [
+  ['💻', ['code', 'coding', 'program', 'programming', 'bug', 'debug', 'deploy', 'refactor', 'commit', 'repo', 'api', 'frontend', 'backend', 'software', 'git', 'merge', 'pull request', 'pr', 'unit test']],
+  ['📚', ['study', 'studies', 'studying', 'learn', 'learning', 'revise', 'revision', 'exam', 'homework', 'assignment', 'lecture', 'course', 'tutorial', 'quiz', 'flashcard']],
+  ['📖', ['read', 'reading', 'book', 'article', 'chapter', 'novel']],
+  ['🏋️', ['gym', 'workout', 'exercise', 'run', 'running', 'jog', 'jogging', 'yoga', 'training', 'lift', 'cardio', 'swim', 'cycling', 'stretch', 'pilates']],
+  ['🛒', ['buy', 'shop', 'shopping', 'groceries', 'grocery', 'purchase', 'order', 'supermarket']],
+  ['🤝', ['meeting', 'meet', 'standup', 'stand-up', 'sync', 'interview', '1:1', 'catch up', 'catch-up', 'retro', 'kickoff']],
+  ['🧹', ['clean', 'cleaning', 'tidy', 'vacuum', 'dishes', 'declutter', 'mop', 'sweep', 'dust']],
+  ['🧺', ['laundry', 'iron', 'ironing']],
+  ['🍳', ['cook', 'cooking', 'dinner', 'lunch', 'breakfast', 'meal prep', 'bake', 'baking', 'recipe']],
+  ['✉️', ['email', 'e-mail', 'mail', 'inbox', 'reply']],
+  ['📞', ['call', 'phone', 'ring', 'dial']],
+  ['💰', ['pay', 'bill', 'invoice', 'rent', 'tax', 'taxes', 'bank', 'insurance', 'renew', 'salary']],
+  ['📊', ['report', 'presentation', 'slides', 'deck', 'spreadsheet', 'analytics', 'metrics']],
+  ['✍️', ['write', 'writing', 'draft', 'blog', 'essay', 'document', 'documentation', 'notes', 'journal']],
+  ['🗓️', ['plan', 'planning', 'schedule', 'organize', 'organise', 'roadmap', 'agenda']],
+  ['✈️', ['flight', 'travel', 'trip', 'hotel', 'vacation', 'passport', 'pack', 'packing']],
+  ['🏥', ['doctor', 'dentist', 'appointment', 'medicine', 'checkup', 'hospital', 'pharmacy', 'therapy']],
+  ['🎉', ['birthday', 'party', 'gift', 'celebrate', 'wedding', 'anniversary']],
+  ['🔧', ['fix', 'repair', 'maintenance', 'install', 'replace', 'assemble']],
+  ['🐾', ['dog', 'cat', 'pet', 'vet', 'walk the dog']],
+  ['🧘', ['meditate', 'meditation', 'mindfulness', 'breathe']],
+  ['😴', ['sleep', 'nap', 'rest', 'bedtime']]
+].map(([emoji, kws]) => ({
+  emoji,
+  re: new RegExp('\\b(?:' + kws.map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&').replace(/ /g, '\\s+')).join('|') + ')(?:s|es|ed|ing)?(?![\\w-])', 'i')
+}));
+function autoEmoji(t) {
+  const title = t.title || '', desc = t.description || '';
+  let best = null, bestScore = 0;
+  for (const r of EMOJI_RULES) {
+    const score = (r.re.test(title) ? 2 : 0) + (r.re.test(desc) ? 1 : 0);
+    if (score > bestScore) { best = r.emoji; bestScore = score; } // ties: earlier rule wins
+  }
+  return best || CATEGORY_EMOJI[t.category] || DEFAULT_EMOJI;
+}
+function applyAutoEmoji(t) { t.emoji = autoEmoji(t); t.emojiSource = 'auto'; }
+// First grapheme of the input, only if it is actually an emoji
+function firstEmoji(str) {
+  str = String(str || '').trim();
+  if (!str) return '';
+  const first = (window.Intl && Intl.Segmenter)
+    ? [...new Intl.Segmenter(undefined, { granularity: 'grapheme' }).segment(str)][0].segment
+    : Array.from(str)[0];
+  return /\p{Extended_Pictographic}|\p{Regional_Indicator}|^[0-9#*]\uFE0F?\u20E3/u.test(first) ? first : '';
+}
+const EMOJI_CHOICES = ['💻','📚','📖','🏋️','🛒','🤝','🧹','🧺','🍳','✉️','📞','💰','✍️','🗓️','✈️','🏥','🎉','🔧','🐾','🧘','😴','📊','🎯','🚀','🏠','🎨','🎧','🌱','🔥','⭐','📌','✅'];
 
 let tasks = [];
 let editingId = null;
@@ -203,7 +331,7 @@ function dueLabel(t) {
 }
 const priorityOf = p => PRIORITIES[p] || PRIORITIES.medium;
 const options = (items, selected) => items.map(([v, l]) => `<option value="${esc(v)}"${v === selected ? ' selected' : ''}>${esc(l)}</option>`).join('');
-const priorityOptions = sel => options(Object.entries(PRIORITIES).map(([k, p]) => [k, `${p.icon} ${p.label}`]), sel);
+const priorityOptions = sel => options(Object.entries(PRIORITIES).map(([k, p]) => [k, `${p.label}`]), sel);
 const categoryOptions = sel => options([['', 'No category'], ...CATEGORIES.map(c => [c, c])], sel);
 
 /* ---------- Storage: local cache + cloud sync ---------- */
@@ -216,7 +344,7 @@ function sampleTasks() {
     { id: uid(), title: 'Finish project documentation', completed: false, priority: 'high', category: 'Work', dueDate: dateString(), createdAt: now - 2 },
     { id: uid(), title: 'Study Kubernetes', completed: false, priority: 'medium', category: 'Study', dueDate: dateString(), createdAt: now - 1 },
     { id: uid(), title: 'Plan tomorrow', completed: false, priority: 'low', category: 'Personal', dueDate: dateString(1), createdAt: now }
-  ];
+  ].map(t => (applyAutoEmoji(t), t));
 }
 // Returns true if this device already had saved tasks
 function loadTasks() {
@@ -243,9 +371,9 @@ function queueWrite(id, op) {
     .then(() => setSync('☁ Synced'), () => setSync('⚠ Sync problem. Saved on this device.'));
 }
 // Every change: save locally, re-render, then send changes to the cloud
-function commit(changed = [], removedIds = []) {
+function commit(changed = [], removedIds = [], renderNow = true) {
   saveTasks();
-  render();
+  if (renderNow) render(); else renderProgress();
   if (backendOn) schedulePush();
   if (!cloud) return;
   changed.forEach(t => { const copy = { ...t }; queueWrite(t.id, () => cloud.col.doc(copy.id).set(copy)); });
@@ -260,6 +388,7 @@ function applySnapshot(snap) {
   if (editingId && !tasks.some(t => t.id === editingId)) editingId = null;
   if (editingId === null) renderTasks(); // don't disturb an open inline edit
   renderProgress();
+  maintain();
 }
 
 async function initCloud(hadLocal) {
@@ -341,6 +470,7 @@ async function syncNow() {
       render();
     } else if (remote.updatedAt < localTime) schedulePush();
   }
+  maintain();
   setSync('☁ Synced');
 }
 function pullSync() {
@@ -396,6 +526,7 @@ function addTask() {
     dueDate: $('#newDue').value,
     createdAt: Date.now()
   };
+  applyAutoEmoji(task);
   tasks.push(task);
   input.value = '';
   $('#newDue').value = '';
@@ -404,7 +535,12 @@ function addTask() {
 }
 function editTask(id, changes) {
   const task = tasks.find(t => t.id === id);
-  if (task) Object.assign(task, changes);
+  if (task) {
+    // A manual date change starts fresh: drop the rollover badge
+    if ('dueDate' in changes && changes.dueDate !== task.dueDate) { delete task.rolledFrom; delete task.rollCount; }
+    Object.assign(task, changes);
+    if (task.emojiSource !== 'manual') applyAutoEmoji(task); // title/description/category may have changed
+  }
   editingId = null;
   commit(task ? [task] : []);
 }
@@ -419,11 +555,92 @@ function toggleTask(id) {
   const task = tasks.find(t => t.id === id);
   if (task) { task.completed = !task.completed; commit([task]); }
 }
+// Quick way to re-add a daily/recurring task without a full recurrence system
+function duplicateTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  const copy = { ...task, id: uid(), completed: false, dueDate: dateString(), createdAt: Date.now() };
+  delete copy.rolledFrom; delete copy.rollCount; delete copy.rolledOn; // a copy is a fresh task
+  tasks.push(copy);
+  commit([copy]);
+}
 async function clearCompleted() {
   const ids = tasks.filter(t => t.completed).map(t => t.id);
   if (!ids.length || !(await ask('Delete all completed tasks?', 'Delete all'))) return;
   tasks = tasks.filter(t => !t.completed);
   commit([], ids);
+}
+
+/* ---------- Settings, auto-rollover, notifications ---------- */
+const SETTINGS_KEY = 'todoSettings';
+const settings = { rollover: true };
+function loadSettings() {
+  try { const s = JSON.parse(readKey(SETTINGS_KEY) || '{}'); if (typeof s.rollover === 'boolean') settings.rollover = s.rollover; } catch (err) { /* defaults */ }
+}
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+// Moves unfinished, overdue tasks to today by editing them in place (never creates copies, so
+// no duplicates). Only dueDate changes; every other field is untouched. Dates are floating local
+// calendar days, so time zones/DST can't shift them, and a task is never moved earlier or twice a day.
+function rolloverTasks() {
+  if (!settings.rollover) return [];
+  const today = dateString(), moved = [];
+  tasks.forEach(t => {
+    if (t.completed || t.archived || t.recurring || t.recurrence) return; // recurring tasks own their schedule
+    if (t.id === editingId) return;                                      // don't change a task mid-edit
+    if (!ISO_DATE.test(t.dueDate || '') || t.dueDate >= today) return;
+    if (t.rolledOn === today) return;                                    // already handled today
+    t.rolledFrom = t.rolledFrom || t.dueDate;
+    t.rollCount = (t.rollCount || 0) + 1;
+    t.rolledOn = today;
+    t.dueDate = today;
+    moved.push(t);
+  });
+  return moved;
+}
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  $('#toasts').appendChild(el);
+  setTimeout(() => el.remove(), 6000);
+}
+function notifyRollover(moved) {
+  const name = moved[0].title.length > 40 ? moved[0].title.slice(0, 40) + '…' : moved[0].title;
+  toast(moved.length === 1 ? `↻ "${name}" moved to today` : `↻ ${moved.length} unfinished tasks moved to today`);
+}
+// Backfill emoji on older tasks, then roll over; saves + syncs only when something changed
+function maintain() {
+  const changed = new Set();
+  tasks.forEach(t => {
+    if (t.emojiSource !== 'manual' && (t.emoji === undefined || t.emoji === null)) { applyAutoEmoji(t); changed.add(t); }
+  });
+  const moved = rolloverTasks();
+  moved.forEach(t => changed.add(t));
+  if (changed.size) commit([...changed], [], editingId === null);
+  if (moved.length) notifyRollover(moved);
+}
+let lastDay = dateString();
+function dayTick() {
+  const d = dateString();
+  if (d !== lastDay) { lastDay = d; renderDate(); }
+  maintain();
+  if (editingId === null) render();
+}
+
+/* ---------- Emoji picker ---------- */
+let emojiTarget = null;
+function openEmojiPicker(id) {
+  emojiTarget = id;
+  $('#egrid').innerHTML = EMOJI_CHOICES.map(e => `<button type="button" data-e="${e}" aria-label="${e}">${e}</button>`).join('');
+  $('#eCustom').value = ''; $('#eMsg').textContent = '';
+  $('#emojiDlg').showModal();
+}
+function setEmoji(mode, val) {
+  const t = tasks.find(x => x.id === emojiTarget);
+  if (!t) return;
+  if (mode === 'auto') applyAutoEmoji(t); else { t.emoji = val; t.emojiSource = 'manual'; }
+  $('#emojiDlg').close();
+  commit([t]);
 }
 
 /* ---------- Filter, search, sort ---------- */
@@ -435,7 +652,7 @@ function filterTasks(list) {
 function searchTasks(list) {
   const q = view.query.trim().toLowerCase();
   if (!q) return list;
-  return list.filter(t => t.title.toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q));
+  return list.filter(t => t.title.toLowerCase().includes(q) || (t.description || '').toLowerCase().includes(q) || (t.category || '').toLowerCase().includes(q));
 }
 function sortTasks(list) {
   const byPriority = (a, b) => priorityOf(a.priority).rank - priorityOf(b.priority).rank || b.createdAt - a.createdAt;
@@ -458,18 +675,24 @@ function taskHTML(t) {
       <input type="date" class="e-due" value="${esc(t.dueDate || '')}" aria-label="Due date">
       <button type="button" class="btn save">Save</button>
       <button type="button" class="btn ghost cancel">Cancel</button>
+      <input type="text" class="e-desc" value="${esc(t.description || '')}" placeholder="Description (optional)" aria-label="Description" maxlength="500">
     </li>`;
   }
   const p = priorityOf(t.priority);
   const due = dueLabel(t);
+  const emoBtn = `<button type="button" class="emo" aria-label="${t.emoji ? 'Change emoji' : 'Add emoji'}" title="Change emoji">${t.emoji ? esc(t.emoji) : '·'}</button>`;
+  const rolled = t.rolledFrom && t.rollCount ? `<span class="roll" title="Rolled over ${t.rollCount}×">↻ ${t.rollCount > 1 ? '×' + t.rollCount + ' ' : ''}from ${esc(shortDate(t.rolledFrom))}</span>` : '';
   const classes = ['task', t.completed ? 'done' : '', isOverdue(t) ? 'overdue' : ''].join(' ');
   return `<li class="${classes}" data-id="${t.id}">
     <input type="checkbox" class="chk" ${t.completed ? 'checked' : ''} aria-label="Mark &quot;${esc(t.title)}&quot; as ${t.completed ? 'not done' : 'done'}">
+    ${emoBtn}
     <div class="body">
       <div class="title">${esc(t.title)}</div>
-      <div class="meta">${t.category ? `<span class="cat">${esc(t.category)}</span>` : ''}${due ? `<span class="${isOverdue(t) ? 'late' : ''}">${esc(due)}</span>` : ''}</div>
+      ${t.description ? `<div class="desc">${esc(t.description)}</div>` : ''}
+      <div class="meta">${t.category ? `<span class="cat">${esc(t.category)}</span>` : ''}${due ? `<span class="${isOverdue(t) ? 'late' : ''}">${esc(due)}</span>` : ''}${rolled}</div>
     </div>
-    <span class="pri" title="${p.label} priority" role="img" aria-label="${p.label} priority">${p.icon}</span>
+    <span class="pri ${p.cls}" title="${p.label} priority" role="img" aria-label="${p.label} priority">${p.icon}</span>
+    <button type="button" class="icon dup" aria-label="Duplicate task for today" title="Duplicate for today">⧉</button>
     <button type="button" class="icon edit" aria-label="Edit task" title="Edit">✎</button>
     <button type="button" class="icon del" aria-label="Delete task" title="Delete">🗑</button>
   </li>`;
@@ -481,11 +704,11 @@ function renderTasks() {
   const filtering = view.query.trim() || view.priority !== 'all';
 
   if (tasks.length === 0) {
-    list.innerHTML = '<div class="empty"><div class="big">🎉</div><strong>Nothing to do!</strong>You\'re all caught up.</div>';
+    list.innerHTML = '<div class="empty"><div class="big">[ ]</div><strong>Nothing to do</strong>You\'re all caught up.</div>';
     return;
   }
   if (visible.length === 0 && filtering) {
-    list.innerHTML = '<div class="empty"><div class="big">🔎</div><strong>No tasks found.</strong></div>';
+    list.innerHTML = '<div class="empty"><div class="big">?</div><strong>No tasks found</strong></div>';
     return;
   }
 
@@ -498,7 +721,7 @@ function renderTasks() {
   list.innerHTML = groups.filter(g => g.show).map(g => `
     <section class="group" aria-label="${g.name}">
       <h2>${g.name} <span class="count">${g.items.length}</span></h2>
-      ${g.items.length ? `<ul>${g.items.map(taskHTML).join('')}</ul>` : '<p class="empty-sm">No tasks here 🎉</p>'}
+      ${g.items.length ? `<ul>${g.items.map(taskHTML).join('')}</ul>` : '<p class="empty-sm">No tasks here</p>'}
     </section>`).join('');
 }
 
@@ -531,6 +754,7 @@ function saveEdit(li) {
   if (!title) { $('.e-title', li).focus(); return; }
   editTask(li.dataset.id, {
     title,
+    description: $('.e-desc', li).value.trim(),
     priority: $('.e-pri', li).value,
     category: $('.e-cat', li).value,
     dueDate: $('.e-due', li).value
@@ -542,8 +766,10 @@ listEl.addEventListener('click', e => {
   const li = e.target.closest('li.task');
   if (!li) return;
   const id = li.dataset.id;
-  if (e.target.closest('.edit')) startEdit(id);
+  if (e.target.closest('.emo')) openEmojiPicker(id);
+  else if (e.target.closest('.edit')) startEdit(id);
   else if (e.target.closest('.del')) deleteTask(id);
+  else if (e.target.closest('.dup')) duplicateTask(id);
   else if (e.target.closest('.save')) saveEdit(li);
   else if (e.target.closest('.cancel')) { editingId = null; renderTasks(); }
 });
@@ -562,7 +788,33 @@ listEl.addEventListener('keydown', e => {
 });
 
 $('#pwForm').addEventListener('submit', unlock);
+$('#settingsBtn').addEventListener('click', () => { $('#optRollover').checked = settings.rollover; $('#settingsDlg').showModal(); });
+$('#optRollover').addEventListener('change', e => {
+  settings.rollover = e.target.checked;
+  writeKey(SETTINGS_KEY, JSON.stringify(settings));
+  if (settings.rollover) maintain();
+});
+$('#egrid').addEventListener('click', e => { const b = e.target.closest('button'); if (b) setEmoji('set', b.dataset.e); });
+$('#eAuto').addEventListener('click', () => setEmoji('auto'));
+$('#eNone').addEventListener('click', () => setEmoji('set', ''));
+$('#eClose').addEventListener('click', () => $('#emojiDlg').close());
+$('#eForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const em = firstEmoji($('#eCustom').value);
+  if (em) setEmoji('set', em); else $('#eMsg').textContent = 'Please enter an emoji.';
+});
 $('#addForm').addEventListener('submit', e => { e.preventDefault(); addTask(); });
+document.querySelector('.datechips').addEventListener('click', e => {
+  const btn = e.target.closest('.chip');
+  if (!btn) return;
+  const when = btn.dataset.when;
+  $('#newDue').value = when === 'today' ? dateString() : when === 'tomorrow' ? dateString(1) : when === 'week' ? dateString(7) : '';
+  document.querySelectorAll('.datechips .chip').forEach(c => c.setAttribute('aria-pressed', c === btn));
+  $('#newTitle').focus();
+});
+$('#newDue').addEventListener('input', () => {
+  document.querySelectorAll('.datechips .chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+});
 $('#clearBtn').addEventListener('click', clearCompleted);
 $('#sort').addEventListener('change', e => { view.sort = e.target.value; renderTasks(); });
 $('#search').addEventListener('input', e => { view.query = e.target.value; renderTasks(); });
@@ -584,23 +836,32 @@ document.addEventListener('keydown', e => {
   if (e.key === '/' && !typing) {
     e.preventDefault();
     $('#search').focus();
+  } else if (e.key === 'n' && !typing) {
+    e.preventDefault();
+    $('#newTitle').focus();
   } else if (e.key === 'Escape' && (view.query || document.activeElement === $('#search'))) {
     $('#search').value = '';
     view.query = '';
     $('#search').blur();
     renderTasks();
+  } else if (e.key === 'Escape' && document.activeElement === $('#newTitle')) {
+    $('#newTitle').blur();
   }
 });
 
 // Refresh date-based grouping when returning to the tab (e.g. after midnight)
-window.addEventListener('focus', () => { renderDate(); if (editingId === null) render(); });
+window.addEventListener('focus', dayTick);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) dayTick(); });
+setInterval(dayTick, 60000); // catches midnight while the tab stays open
 
 /* ---------- Init ---------- */
 $('#newPriority').innerHTML = priorityOptions('medium');
 $('#newCategory').innerHTML = categoryOptions('');
 try { localStorage.removeItem('todoTheme'); } catch (err) { /* ignore */ } // clear old dark setting
 renderDate();
+loadSettings();
 const hadLocal = loadTasks();
+maintain();
 render();
 initCloud(hadLocal);
 </script>
