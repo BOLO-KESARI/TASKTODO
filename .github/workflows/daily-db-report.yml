@@ -1,0 +1,33 @@
+name: End of Day Database Health & Report
+
+on:
+  schedule:
+    # Runs daily at 18:00 UTC (11:30 PM IST / end of day)
+    - cron: '0 18 * * *'
+  # Allows you to manually trigger the report from GitHub Actions tab whenever you want
+  workflow_dispatch:
+
+jobs:
+  db-health-and-report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci || npm install
+
+      - name: Check Database Health & Send End-of-Day Report
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: node scripts/db-daily-report.js

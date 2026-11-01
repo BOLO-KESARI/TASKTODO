@@ -9,6 +9,7 @@
     "@neondatabase/serverless": "^0.10.1"
   },
   "scripts": {
-    "setup-webhook": "node scripts/setup-webhook.js"
+    "setup-webhook": "node scripts/setup-webhook.js",
+    "db-report": "node scripts/db-daily-report.js"
   }
 }
