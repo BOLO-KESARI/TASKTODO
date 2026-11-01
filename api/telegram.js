@@ -38,10 +38,9 @@ async function ensureTable(db) {
   `;
   await db`
     CREATE TABLE IF NOT EXISTS tg_chats (
-      chat_id     BIGINT PRIMARY KEY,
-      bound_at    BIGINT NOT NULL DEFAULT 0,
-      remind_time TEXT   NOT NULL DEFAULT '08:00',
-      remind_on   BOOLEAN NOT NULL DEFAULT TRUE
+      chat_id   BIGINT  PRIMARY KEY,
+      bound_at  BIGINT  NOT NULL DEFAULT 0,
+      remind_on BOOLEAN NOT NULL DEFAULT TRUE
     )
   `;
 }
@@ -169,8 +168,7 @@ async function handleStart(db, chatId, firstName) {
     `/delete &lt;number&gt; — delete a task\n` +
     `/upcoming — tasks due in the next 7 days\n` +
     `/overdue — show overdue tasks\n` +
-    `/remindme &lt;HH:MM&gt; — set daily reminder time\n` +
-    `/reminders on|off — toggle daily reminders\n` +
+    `/reminders on|off — toggle daily reminders (sent at 08:00 UTC)\n` +
     `/help — show this message\n\n` +
     `💡 Tasks sync automatically between Telegram and the website.`
   );
@@ -190,8 +188,7 @@ async function handleHelp(chatId) {
     `/delete &lt;number&gt; — delete a task\n` +
     `/upcoming — tasks due in the next 7 days\n` +
     `/overdue — overdue active tasks\n` +
-    `/remindme 08:30 — set daily reminder time (UTC)\n` +
-    `/reminders on|off — toggle daily reminders\n\n` +
+    `/reminders on|off — daily reminder at 08:00 UTC\n\n` +
     `Tasks stay in sync with the taskctl website automatically.`
   );
 }
@@ -317,35 +314,21 @@ async function handleOverdue(db, chatId) {
   return sendMessage(chatId, out);
 }
 
-async function handleRemindMe(db, chatId, args) {
-  const time = args.trim();
-  if (!/^\d{1,2}:\d{2}$/.test(time)) {
-    return sendMessage(chatId,
-      '⚠️ Please provide a time in HH:MM format.\nExample: <code>/remindme 08:30</code>'
-    );
-  }
-  const parts = time.split(':').map(Number);
-  const h = parts[0], m = parts[1];
-  if (h > 23 || m > 59) {
-    return sendMessage(chatId, '⚠️ Invalid time. Please use HH:MM (00:00–23:59).');
-  }
-  const formatted = `${pad(h)}:${pad(m)}`;
-  await db`
-    INSERT INTO tg_chats (chat_id, bound_at, remind_time, remind_on)
-    VALUES (${chatId}, ${Date.now()}, ${formatted}, TRUE)
-    ON CONFLICT (chat_id) DO UPDATE
-      SET remind_time = EXCLUDED.remind_time,
-          remind_on   = TRUE
-  `;
+// /remindme is retired on the Hobby plan — redirect users to /reminders
+async function handleRemindMe(chatId) {
   return sendMessage(chatId,
-    `⏰ Daily reminder set for <b>${formatted}</b> UTC.\n\nI'll send you your active tasks every day at that time.`
+    `⏰ Daily reminders are sent at <b>08:00 UTC</b> every morning.\n\n` +
+    `Use /reminders on to enable them, or /reminders off to disable.`
   );
 }
 
 async function handleReminders(db, chatId, args) {
   const val = args.trim().toLowerCase();
   if (val !== 'on' && val !== 'off') {
-    return sendMessage(chatId, '⚠️ Usage: <code>/reminders on</code> or <code>/reminders off</code>');
+    return sendMessage(chatId,
+      '⚠️ Usage: <code>/reminders on</code> or <code>/reminders off</code>\n\n' +
+      'Reminders are sent at <b>08:00 UTC</b> every morning.'
+    );
   }
   const on = val === 'on';
   await db`
@@ -354,7 +337,9 @@ async function handleReminders(db, chatId, args) {
     ON CONFLICT (chat_id) DO UPDATE SET remind_on = ${on}
   `;
   return sendMessage(chatId,
-    on ? '🔔 Daily reminders <b>enabled</b>.' : '🔕 Daily reminders <b>disabled</b>.'
+    on
+      ? '🔔 Daily reminders <b>enabled</b>.\nYou\'ll get a task digest every morning at <b>08:00 UTC</b>.'
+      : '🔕 Daily reminders <b>disabled</b>. Send /reminders on to re-enable.'
   );
 }
 
@@ -406,7 +391,7 @@ module.exports = async function handler(req, res) {
       case '/del':       await handleDelete(db, chatId, args); break;
       case '/upcoming':  await handleUpcoming(db, chatId); break;
       case '/overdue':   await handleOverdue(db, chatId); break;
-      case '/remindme':  await handleRemindMe(db, chatId, args); break;
+      case '/remindme':  await handleRemindMe(chatId); break;  // retired — 08:00 UTC fixed
       case '/reminders': await handleReminders(db, chatId, args); break;
       default:
         await sendMessage(chatId, `❓ Unknown command: <code>${cmd}</code>\n\nUse /help to see all commands.`);
