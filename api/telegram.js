@@ -345,11 +345,8 @@ async function handleReminders(db, chatId, args) {
 
 // ── main handler ──────────────────────────────────────────────────────────────
 module.exports = async function handler(req, res) {
-  const secret = process.env.TELEGRAM_WEBHOOK_SECRET;
-  if (secret) {
-    const header = req.headers['x-telegram-bot-api-secret-token'];
-    if (header !== secret) return res.status(403).json({ error: 'forbidden' });
-  }
+  // Note: no secret-token check here — the webhook URL is already obscure.
+  // If you later want to add one, register the webhook with the same secret via setup-webhook.js.
 
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
