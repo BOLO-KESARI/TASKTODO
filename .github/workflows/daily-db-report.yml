@@ -25,8 +25,13 @@ jobs:
         run: npm install
 
       - name: Check Database Health & Send End-of-Day Report
+        if: ${{ secrets.DATABASE_URL != '' }}
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: node scripts/db-daily-report.js
+
+      - name: Skip report when DATABASE_URL secret is missing
+        if: ${{ secrets.DATABASE_URL == '' }}
+        run: echo "DATABASE_URL secret is not configured, skipping database health report."
