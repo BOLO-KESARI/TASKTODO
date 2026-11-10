@@ -122,6 +122,80 @@ dialog .actions{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 :root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 @media(prefers-reduced-motion:reduce){.bar i{transition:none}}
+
+/* ═══════════════════════════════════════════════
+   API PORTAL — styles
+═══════════════════════════════════════════════ */
+.api-overlay{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;opacity:0;pointer-events:none;transition:opacity .25s}
+.api-overlay.open{opacity:1;pointer-events:all}
+.api-drawer{position:fixed;top:0;right:0;bottom:0;width:min(680px,100vw);background:var(--bg-raised);border-left:1px solid var(--border);z-index:41;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);overflow:hidden}
+.api-drawer.open{transform:translateX(0)}
+.api-drawer-head{display:flex;align-items:center;gap:12px;padding:18px 20px;border-bottom:1px solid var(--border);background:var(--bg-raised);flex:none}
+.api-drawer-head h2{margin:0;font-size:15px;font-weight:700;letter-spacing:.02em;color:var(--text);font-family:var(--mono)}
+.api-drawer-head .badge{font-size:10px;padding:2px 7px;border-radius:3px;background:var(--accent);color:var(--accent-ink);font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.api-drawer-close{margin-left:auto;background:transparent;border:0;color:var(--muted);font-size:18px;cursor:pointer;width:34px;height:34px;border-radius:4px;display:flex;align-items:center;justify-content:center}
+.api-drawer-close:hover{background:var(--border);color:var(--text)}
+.api-tabs{display:flex;border-bottom:1px solid var(--border);flex:none;background:var(--bg)}
+.api-tab{flex:1;background:transparent;border:0;border-bottom:2px solid transparent;padding:10px 6px;font:inherit;font-size:12px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);cursor:pointer;font-family:var(--mono);transition:color .15s,border-color .15s}
+.api-tab:hover{color:var(--text)}
+.api-tab[aria-selected=true]{color:var(--accent);border-bottom-color:var(--accent)}
+.api-body{flex:1;overflow-y:auto;padding:20px}
+.api-section{display:none}
+.api-section.active{display:block}
+
+/* endpoints */
+.ep-card{border:1px solid var(--border);border-radius:6px;margin-bottom:14px;overflow:hidden}
+.ep-head{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--card);cursor:pointer;user-select:none}
+.ep-head:hover{background:var(--bg)}
+.method{font-size:11px;font-weight:700;padding:2px 8px;border-radius:3px;font-family:var(--mono);flex:none;letter-spacing:.05em}
+.method.get{background:#1a3a1f;color:#6fcf6f}
+.method.put{background:#2e2a0f;color:#e0c46b}
+.method.post{background:#1c2a40;color:#6aaef0}
+.ep-path{font-family:var(--mono);font-size:13px;color:var(--text)}
+.ep-desc{font-size:12px;color:var(--muted);margin-left:auto}
+.ep-body{padding:14px;border-top:1px solid var(--border);display:none}
+.ep-body.open{display:block}
+.ep-body h3{margin:0 0 8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.param-row{display:grid;grid-template-columns:140px 1fr;gap:6px 10px;font-size:12px;margin-bottom:4px;align-items:start}
+.param-name{color:var(--accent);font-family:var(--mono)}
+.param-type{font-size:10px;color:var(--muted);border:1px solid var(--border);border-radius:3px;padding:0 5px;font-family:var(--mono);display:inline-block;margin-right:4px}
+
+/* code blocks */
+.code-wrap{position:relative;margin:8px 0}
+.code-block{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:11px 44px 11px 12px;font-family:var(--mono);font-size:12px;line-height:1.6;color:#c9d1d9;white-space:pre;overflow-x:auto;tab-size:2}
+.code-wrap .copy-btn{position:absolute;top:7px;right:7px;background:var(--border);border:0;border-radius:4px;padding:3px 8px;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer;white-space:nowrap;transition:background .15s,color .15s}
+.code-wrap .copy-btn:hover{background:var(--accent);color:var(--accent-ink)}
+.code-wrap .copy-btn.copied{background:var(--accent);color:var(--accent-ink)}
+
+/* snippet tabs */
+.snippet-tabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.snippet-tab{background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 11px;font:inherit;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer}
+.snippet-tab:hover{border-color:var(--accent);color:var(--text)}
+.snippet-tab.active{background:var(--accent);border-color:var(--accent);color:var(--accent-ink);font-weight:700}
+.snippet-panel{display:none}
+.snippet-panel.active{display:block}
+
+/* keys panel */
+.key-toolbar{display:flex;gap:8px;margin-bottom:16px}
+.key-toolbar input{flex:1}
+.keys-list{display:flex;flex-direction:column;gap:8px}
+.key-row{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--border);border-radius:6px;padding:10px 12px}
+.key-row-info{flex:1;min-width:0}
+.key-name{font-size:13px;font-weight:600;color:var(--text)}
+.key-val{font-family:var(--mono);font-size:11px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:280px;cursor:pointer}
+.key-val.revealed{color:var(--accent)}
+.key-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.key-actions{display:flex;gap:6px;flex:none}
+.key-actions button{background:transparent;border:1px solid var(--border);border-radius:4px;padding:4px 9px;font:inherit;font-size:11px;font-family:var(--mono);color:var(--muted);cursor:pointer}
+.key-actions button:hover{border-color:var(--accent);color:var(--text)}
+.key-actions button.danger:hover{border-color:var(--danger);color:var(--danger)}
+.key-actions button.copy:hover{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.key-actions button.copy.copied{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.empty-keys{text-align:center;color:var(--muted);font-size:13px;padding:36px 16px;border:1px dashed var(--border);border-radius:6px}
+.info-box{background:var(--bg);border:1px solid var(--border);border-radius:5px;padding:11px 13px;font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:14px}
+.info-box code{color:var(--accent);font-family:var(--mono)}
+.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:0 0 10px}
+@media(max-width:680px){.api-drawer{width:100vw}.param-row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -140,6 +214,7 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
       <p id="sync" class="muted" style="font-size:12px" aria-live="polite">Connecting…</p>
     </div>
     <div class="right">
+      <button type="button" id="apiPortalBtn" class="icon" aria-label="API Portal" title="API Portal / Developer Keys">🔑</button>
       <button type="button" id="settingsBtn" class="icon" aria-label="Settings" title="Settings">⚙</button>
       <p id="hdrProgress" class="pill" aria-live="polite"></p>
     </div>
@@ -236,6 +311,319 @@ html{scroll-padding-top:env(safe-area-inset-top,0px)}
     </form>
   </dialog>
 </main>
+
+<!-- ═══ API PORTAL DRAWER ═══ -->
+<div class="api-overlay" id="apiOverlay" aria-hidden="true"></div>
+<aside class="api-drawer" id="apiDrawer" role="complementary" aria-label="API Portal" aria-hidden="true">
+
+  <div class="api-drawer-head">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="15.5" r="5.5"/><path d="M21 2l-9.6 9.6M15.5 7.5l3 3"/></svg>
+    <h2>API Portal</h2>
+    <span class="badge">taskctl</span>
+    <button class="api-drawer-close" id="apiDrawerClose" aria-label="Close API Portal">✕</button>
+  </div>
+
+  <nav class="api-tabs" role="tablist" aria-label="API Portal sections">
+    <button class="api-tab" role="tab" aria-selected="true"  data-tab="reference"  id="tab-reference">📡 Reference</button>
+    <button class="api-tab" role="tab" aria-selected="false" data-tab="snippets"   id="tab-snippets">⚡ Snippets</button>
+    <button class="api-tab" role="tab" aria-selected="false" data-tab="keys"       id="tab-keys">🔑 My API Keys</button>
+  </nav>
+
+  <div class="api-body">
+
+    <!-- ── TAB 1: API REFERENCE ───────────────────────────────── -->
+    <section class="api-section active" id="sec-reference" role="tabpanel" aria-labelledby="tab-reference">
+      <p class="info-box">
+        Base URL: <code id="apiBaseUrl"></code><br>
+        All endpoints accept <code>Content-Type: application/json</code>.<br>
+        If your instance is password-protected, include the header <code>X-Todo-Password: &lt;password&gt;</code>.
+      </p>
+
+      <!-- GET /api/tasks -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="get-tasks">
+          <span class="method get">GET</span>
+          <span class="ep-path">/api/tasks</span>
+          <span class="ep-desc">Fetch all tasks</span>
+        </div>
+        <div class="ep-body" id="ep-get-tasks">
+          <h3>Response</h3>
+          <div class="param-row"><span class="param-name">updatedAt</span><span><span class="param-type">number</span>Unix ms timestamp of last write.</span></div>
+          <div class="param-row"><span class="param-name">tasks</span><span><span class="param-type">array | null</span>Array of task objects, or <code>null</code> if the store is empty.</span></div>
+          <h3 style="margin-top:12px">Example response</h3>
+          <div class="code-wrap">
+            <pre class="code-block">{
+  "updatedAt": 1715000000000,
+  "tasks": [
+    {
+      "id": "lx4k9z2ab",
+      "title": "Finish project documentation",
+      "completed": false,
+      "priority": "high",
+      "category": "Work",
+      "dueDate": "2026-11-10",
+      "emoji": "✍️",
+      "createdAt": 1714900000000
+    }
+  ]
+}</pre>
+            <button class="copy-btn" data-copy-target="get-tasks-ex">Copy</button>
+          </div>
+          <h3 style="margin-top:12px">cURL</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-get-tasks"></pre>
+            <button class="copy-btn" data-copy-id="curl-get-tasks">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PUT /api/tasks -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="put-tasks">
+          <span class="method put">PUT</span>
+          <span class="ep-path">/api/tasks</span>
+          <span class="ep-desc">Replace entire task list</span>
+        </div>
+        <div class="ep-body" id="ep-put-tasks">
+          <h3>Request body</h3>
+          <div class="param-row"><span class="param-name">updatedAt</span><span><span class="param-type">number</span>Current timestamp — used for conflict resolution.</span></div>
+          <div class="param-row"><span class="param-name">tasks</span><span><span class="param-type">array</span>Full array of task objects to persist.</span></div>
+          <h3 style="margin-top:12px">Example request</h3>
+          <div class="code-wrap">
+            <pre class="code-block">PUT /api/tasks
+Content-Type: application/json
+
+{
+  "updatedAt": 1715000000000,
+  "tasks": [
+    {
+      "id": "lx4k9z2ab",
+      "title": "New task",
+      "completed": false,
+      "priority": "medium",
+      "category": "Work",
+      "dueDate": "2026-11-11",
+      "createdAt": 1715000000000
+    }
+  ]
+}</pre>
+            <button class="copy-btn" data-copy-prev>Copy</button>
+          </div>
+          <h3 style="margin-top:12px">cURL</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-put-tasks"></pre>
+            <button class="copy-btn" data-copy-id="curl-put-tasks">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- POST /api/telegram -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="post-telegram">
+          <span class="method post">POST</span>
+          <span class="ep-path">/api/telegram</span>
+          <span class="ep-desc">Telegram bot webhook</span>
+        </div>
+        <div class="ep-body" id="ep-post-telegram">
+          <p class="info-box">This endpoint receives Telegram update payloads. Register it as your bot's webhook via @BotFather. See the <a href="https://core.telegram.org/bots/api#setwebhook" target="_blank" style="color:var(--accent)">Telegram docs</a> for setup.</p>
+          <h3>Register webhook</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-telegram-wh"></pre>
+            <button class="copy-btn" data-copy-id="curl-telegram-wh">Copy</button>
+          </div>
+          <h3 style="margin-top:12px">Bot commands</h3>
+          <div class="param-row"><span class="param-name">/list</span><span>Show all active tasks</span></div>
+          <div class="param-row"><span class="param-name">/add &lt;text&gt;</span><span>Add a new task</span></div>
+          <div class="param-row"><span class="param-name">/done &lt;id&gt;</span><span>Mark a task complete</span></div>
+          <div class="param-row"><span class="param-name">/reminders on|off</span><span>Toggle daily reminder notifications</span></div>
+          <div class="param-row"><span class="param-name">/help</span><span>Show all available commands</span></div>
+        </div>
+      </div>
+
+      <!-- GET /api/reminders (cron) -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="get-reminders">
+          <span class="method get">GET</span>
+          <span class="ep-path">/api/reminders</span>
+          <span class="ep-desc">Trigger daily reminders (cron)</span>
+        </div>
+        <div class="ep-body" id="ep-get-reminders">
+          <p class="info-box">Called automatically by Vercel Cron at 08:00 UTC daily. Sends a task summary to all Telegram chats with reminders enabled. Requires <code>Authorization: Bearer &lt;CRON_SECRET&gt;</code>.</p>
+          <h3>cURL (manual trigger)</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-reminders"></pre>
+            <button class="copy-btn" data-copy-id="curl-reminders">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET /api/health -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="get-health">
+          <span class="method get">GET</span>
+          <span class="ep-path">/api/health</span>
+          <span class="ep-desc">Service health check (public)</span>
+        </div>
+        <div class="ep-body" id="ep-get-health">
+          <p class="info-box">No authentication required. Returns HTTP&nbsp;200 when the database is reachable, HTTP&nbsp;503 when degraded. Use this with uptime monitors (UptimeRobot, BetterStack, etc.).</p>
+          <h3>Response fields</h3>
+          <div class="param-row"><span class="param-name">status</span><span><span class="param-type">string</span><code>"ok"</code> or <code>"degraded"</code></span></div>
+          <div class="param-row"><span class="param-name">checks.db</span><span><span class="param-type">boolean</span>Whether the Neon Postgres ping succeeded.</span></div>
+          <div class="param-row"><span class="param-name">latencyMs</span><span><span class="param-type">number</span>Database round-trip in milliseconds.</span></div>
+          <div class="param-row"><span class="param-name">ts</span><span><span class="param-type">number</span>Server-side Unix ms timestamp.</span></div>
+          <h3 style="margin-top:12px">cURL</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-health"></pre>
+            <button class="copy-btn" data-copy-id="curl-health">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET /api/stats -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="get-stats">
+          <span class="method get">GET</span>
+          <span class="ep-path">/api/stats</span>
+          <span class="ep-desc">Task analytics &amp; counts</span>
+        </div>
+        <div class="ep-body" id="ep-get-stats">
+          <p class="info-box">Returns aggregate counts and category breakdowns. No task titles or content are returned &mdash; safe to expose in dashboards.</p>
+          <h3>Response fields</h3>
+          <div class="param-row"><span class="param-name">total</span><span><span class="param-type">number</span>Total task count.</span></div>
+          <div class="param-row"><span class="param-name">completed / active</span><span><span class="param-type">number</span>Counts by completion state.</span></div>
+          <div class="param-row"><span class="param-name">overdue / dueToday</span><span><span class="param-type">number</span>Active tasks by urgency.</span></div>
+          <div class="param-row"><span class="param-name">upcoming7</span><span><span class="param-type">number</span>Active tasks due in the next 7 days.</span></div>
+          <div class="param-row"><span class="param-name">completionRate</span><span><span class="param-type">number</span>0–100 percentage of completed tasks.</span></div>
+          <div class="param-row"><span class="param-name">byPriority</span><span><span class="param-type">object</span><code>{ high, medium, low }</code> counts.</span></div>
+          <div class="param-row"><span class="param-name">byCategory</span><span><span class="param-type">object</span>Category name → count map.</span></div>
+          <div class="param-row"><span class="param-name">recentlyCompleted</span><span><span class="param-type">array</span>Last 5 completed tasks (id + title + emoji only).</span></div>
+          <h3 style="margin-top:12px">cURL</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-stats"></pre>
+            <button class="copy-btn" data-copy-id="curl-stats">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET / PATCH / DELETE /api/task -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="task-crud">
+          <span class="method get">GET</span>&nbsp;<span class="method put">PATCH</span>&nbsp;<span class="method" style="background:#231726;color:#c47de0">DEL</span>
+          <span class="ep-path">/api/task?id=&lt;id&gt;</span>
+          <span class="ep-desc">Per-task CRUD</span>
+        </div>
+        <div class="ep-body" id="ep-task-crud">
+          <p class="info-box">Operate on a <strong>single task by ID</strong> without replacing the whole list. <code>PATCH</code> only updates the fields you send &mdash; unspecified fields are untouched.</p>
+          <h3>Query param</h3>
+          <div class="param-row"><span class="param-name">id</span><span><span class="param-type">string</span>Task ID (from <code>GET /api/tasks</code> response).</span></div>
+          <h3 style="margin-top:12px">PATCH — patchable fields</h3>
+          <div class="param-row"><span class="param-name">title</span><span><span class="param-type">string</span>New title (non-empty).</span></div>
+          <div class="param-row"><span class="param-name">completed</span><span><span class="param-type">boolean</span>Mark done or undone.</span></div>
+          <div class="param-row"><span class="param-name">priority</span><span><span class="param-type">string</span><code>"high"</code> | <code>"medium"</code> | <code>"low"</code></span></div>
+          <div class="param-row"><span class="param-name">category</span><span><span class="param-type">string</span>Category label.</span></div>
+          <div class="param-row"><span class="param-name">dueDate</span><span><span class="param-type">string</span><code>"YYYY-MM-DD"</code> or <code>""</code> to clear.</span></div>
+          <div class="param-row"><span class="param-name">description</span><span><span class="param-type">string</span>Optional task notes.</span></div>
+          <h3 style="margin-top:12px">cURL examples</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-task-get"></pre>
+            <button class="copy-btn" data-copy-id="curl-task-get">Copy</button>
+          </div>
+          <div class="code-wrap" style="margin-top:8px">
+            <pre class="code-block" id="curl-task-patch"></pre>
+            <button class="copy-btn" data-copy-id="curl-task-patch">Copy</button>
+          </div>
+          <div class="code-wrap" style="margin-top:8px">
+            <pre class="code-block" id="curl-task-del"></pre>
+            <button class="copy-btn" data-copy-id="curl-task-del">Copy</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GET / POST / DELETE /api/keys -->
+      <div class="ep-card">
+        <div class="ep-head" data-ep="keys-crud">
+          <span class="method get">GET</span>&nbsp;<span class="method post">POST</span>&nbsp;<span class="method" style="background:#231726;color:#c47de0">DEL</span>
+          <span class="ep-path">/api/keys</span>
+          <span class="ep-desc">API key management</span>
+        </div>
+        <div class="ep-body" id="ep-keys-crud">
+          <p class="info-box">Create, list, and revoke developer API keys stored in the database. The raw key value is returned <strong>only once</strong> at creation time &mdash; store it immediately. Keys are hashed with SHA-256 before storage.</p>
+          <h3>GET /api/keys — list keys</h3>
+          <div class="param-row"><span class="param-name">Response</span><span><code>{ keys: [{ id, name, prefix, createdAt, lastUsed }] }</code></span></div>
+          <h3 style="margin-top:12px">POST /api/keys — create key</h3>
+          <div class="param-row"><span class="param-name">name</span><span><span class="param-type">string (required)</span>Friendly name for the key (max 80 chars).</span></div>
+          <div class="param-row"><span class="param-name">Response</span><span><code>{ id, name, prefix, createdAt, key }</code> &mdash; <code>key</code> is the full plaintext, shown once only.</span></div>
+          <h3 style="margin-top:12px">DELETE /api/keys?id=&lt;id&gt; — revoke key</h3>
+          <div class="param-row"><span class="param-name">id</span><span><span class="param-type">string</span>Key ID from the list.</span></div>
+          <h3 style="margin-top:12px">cURL examples</h3>
+          <div class="code-wrap">
+            <pre class="code-block" id="curl-keys-list"></pre>
+            <button class="copy-btn" data-copy-id="curl-keys-list">Copy</button>
+          </div>
+          <div class="code-wrap" style="margin-top:8px">
+            <pre class="code-block" id="curl-keys-create"></pre>
+            <button class="copy-btn" data-copy-id="curl-keys-create">Copy</button>
+          </div>
+          <div class="code-wrap" style="margin-top:8px">
+            <pre class="code-block" id="curl-keys-revoke"></pre>
+            <button class="copy-btn" data-copy-id="curl-keys-revoke">Copy</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TAB 2: CODE SNIPPETS ──────────────────────────────── -->
+    <section class="api-section" id="sec-snippets" role="tabpanel" aria-labelledby="tab-snippets">
+      <p class="section-title">Ready-to-paste integration code</p>
+      <div class="snippet-tabs" role="tablist">
+        <button class="snippet-tab active" data-snip="js" role="tab">JavaScript</button>
+        <button class="snippet-tab" data-snip="python" role="tab">Python</button>
+        <button class="snippet-tab" data-snip="curl" role="tab">cURL</button>
+        <button class="snippet-tab" data-snip="node" role="tab">Node.js</button>
+      </div>
+
+      <div class="snippet-panel active" id="snip-js">
+        <p class="section-title" style="margin-bottom:6px">Fetch tasks</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-js-get"></pre><button class="copy-btn" data-copy-id="snip-js-get">Copy</button></div>
+        <p class="section-title" style="margin-bottom:6px;margin-top:14px">Add a task</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-js-add"></pre><button class="copy-btn" data-copy-id="snip-js-add">Copy</button></div>
+      </div>
+
+      <div class="snippet-panel" id="snip-python">
+        <p class="section-title" style="margin-bottom:6px">Fetch tasks</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-py-get"></pre><button class="copy-btn" data-copy-id="snip-py-get">Copy</button></div>
+        <p class="section-title" style="margin-bottom:6px;margin-top:14px">Add a task</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-py-add"></pre><button class="copy-btn" data-copy-id="snip-py-add">Copy</button></div>
+      </div>
+
+      <div class="snippet-panel" id="snip-curl">
+        <p class="section-title" style="margin-bottom:6px">Fetch tasks</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-curl-get"></pre><button class="copy-btn" data-copy-id="snip-curl-get">Copy</button></div>
+        <p class="section-title" style="margin-bottom:6px;margin-top:14px">Add a task</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-curl-add"></pre><button class="copy-btn" data-copy-id="snip-curl-add">Copy</button></div>
+      </div>
+
+      <div class="snippet-panel" id="snip-node">
+        <p class="section-title" style="margin-bottom:6px">Full CRUD helper (Node.js / fetch)</p>
+        <div class="code-wrap"><pre class="code-block" id="snip-node-full"></pre><button class="copy-btn" data-copy-id="snip-node-full">Copy</button></div>
+      </div>
+    </section>
+
+    <!-- ── TAB 3: MY API KEYS ────────────────────────────────── -->
+    <section class="api-section" id="sec-keys" role="tabpanel" aria-labelledby="tab-keys">
+      <p class="info-box">
+        API keys are stored locally in your browser. Use them to authenticate requests in your own apps and scripts.
+        Pass the key in the header: <code>X-Todo-Password: &lt;key&gt;</code>.
+      </p>
+      <div class="key-toolbar">
+        <input type="text" id="newKeyName" placeholder="Key name (e.g. Home Server, Python Script)" maxlength="60" aria-label="New key name">
+        <button class="btn" id="genKeyBtn" type="button">+ Generate Key</button>
+      </div>
+      <div class="keys-list" id="keysList"></div>
+    </section>
+
+  </div>
+</aside>
 
 <script>
 const TASKS_KEY = 'todoTasks';
@@ -867,6 +1255,473 @@ const hadLocal = loadTasks();
 maintain();
 render();
 initCloud(hadLocal);
+
+/* ════════════════════════════════════════════════════════════
+   API PORTAL
+════════════════════════════════════════════════════════════ */
+(function() {
+  const API_KEYS_STORE = 'taskctlApiKeys';
+
+  /* ── helpers ── */
+  function baseUrl() {
+    return window.location.origin;
+  }
+  function genToken() {
+    const arr = new Uint8Array(32);
+    crypto.getRandomValues(arr);
+    return 'tsk_' + Array.from(arr).map(b => b.toString(16).padStart(2,'0')).join('');
+  }
+  function loadKeys() {
+    try { return JSON.parse(localStorage.getItem(API_KEYS_STORE) || '[]'); } catch { return []; }
+  }
+  function saveKeys(keys) {
+    try { localStorage.setItem(API_KEYS_STORE, JSON.stringify(keys)); } catch { /* ignore */ }
+  }
+
+  /* ── copy to clipboard ── */
+  function copyText(text, btn) {
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = '✓ Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+    }).catch(() => {
+      // fallback
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta);
+      ta.select(); document.execCommand('copy');
+      ta.remove();
+      btn.textContent = '✓ Copied!'; btn.classList.add('copied');
+      setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1800);
+    });
+  }
+
+  /* ── populate code blocks with live base URL ── */
+  function populateSnippets() {
+    const base = baseUrl();
+    const pw = readKey(PW_KEY) || '<YOUR_PASSWORD>';
+
+    $('#apiBaseUrl').textContent = base;
+
+    // cURL examples in reference tab
+    $('#curl-get-tasks').textContent =
+`curl -s "${base}/api/tasks" \\
+  -H "X-Todo-Password: ${pw}"`;
+
+    $('#curl-put-tasks').textContent =
+`curl -s -X PUT "${base}/api/tasks" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Todo-Password: ${pw}" \\
+  -d '{
+    "updatedAt": '$(date +%s%3N)',
+    "tasks": [
+      {
+        "id": "abc123",
+        "title": "My task",
+        "completed": false,
+        "priority": "medium",
+        "createdAt": '$(date +%s%3N)'
+      }
+    ]
+  }'`;
+
+    $('#curl-telegram-wh').textContent =
+`curl -s "https://api.telegram.org/bot<BOT_TOKEN>/setWebhook" \\
+  -d "url=${base}/api/telegram" \\
+  -d "secret_token=<WEBHOOK_SECRET>"`;
+
+    $('#curl-reminders').textContent =
+`curl -s "${base}/api/reminders" \\
+  -H "Authorization: Bearer <CRON_SECRET>"`;
+
+    // New endpoint cURLs
+    $('#curl-health').textContent =
+`curl -s "${base}/api/health" | python3 -m json.tool`;
+
+    $('#curl-stats').textContent =
+`curl -s "${base}/api/stats" \\
+  -H "X-Todo-Password: ${pw}" | python3 -m json.tool`;
+
+    $('#curl-task-get').textContent =
+`# GET a single task by ID
+curl -s "${base}/api/task?id=<TASK_ID>" \\
+  -H "X-Todo-Password: ${pw}"`;
+
+    $('#curl-task-patch').textContent =
+`# PATCH — partial update (only fields you send are changed)
+curl -s -X PATCH "${base}/api/task?id=<TASK_ID>" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Todo-Password: ${pw}" \\
+  -d '{"completed": true, "priority": "high"}'`;
+
+    $('#curl-task-del').textContent =
+`# DELETE a single task
+curl -s -X DELETE "${base}/api/task?id=<TASK_ID>" \\
+  -H "X-Todo-Password: ${pw}"`;
+
+    $('#curl-keys-list').textContent =
+`# List all API keys
+curl -s "${base}/api/keys" \\
+  -H "X-Todo-Password: ${pw}" | python3 -m json.tool`;
+
+    $('#curl-keys-create').textContent =
+`# Create a new API key — save the returned 'key' value immediately!
+curl -s -X POST "${base}/api/keys" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Todo-Password: ${pw}" \\
+  -d '{"name": "My Python Script"}'`;
+
+    $('#curl-keys-revoke').textContent =
+`# Revoke (delete) a key by its ID
+curl -s -X DELETE "${base}/api/keys?id=<KEY_ID>" \\
+  -H "X-Todo-Password: ${pw}"`;
+
+    $('#snip-js-get').textContent =
+`const BASE = '${base}';
+const PASSWORD = '${pw}';
+
+async function getTasks() {
+  const res = await fetch(BASE + '/api/tasks', {
+    headers: {
+      'X-Todo-Password': PASSWORD,
+      'Accept': 'application/json'
+    }
+  });
+  const data = await res.json();
+  return data.tasks; // array of task objects
+}
+
+getTasks().then(tasks => console.log(tasks));`;
+
+    $('#snip-js-add').textContent =
+`const BASE = '${base}';
+const PASSWORD = '${pw}';
+
+async function addTask(title, priority = 'medium', category = 'Work') {
+  // 1. Fetch current list
+  const { tasks = [], updatedAt } = await (await fetch(BASE + '/api/tasks', {
+    headers: { 'X-Todo-Password': PASSWORD }
+  })).json();
+
+  // 2. Append new task
+  const newTask = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    title,
+    completed: false,
+    priority,
+    category,
+    createdAt: Date.now()
+  };
+  tasks.push(newTask);
+
+  // 3. Push updated list
+  await fetch(BASE + '/api/tasks', {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', 'X-Todo-Password': PASSWORD },
+    body: JSON.stringify({ updatedAt: Date.now(), tasks })
+  });
+
+  return newTask;
+}
+
+addTask('Send weekly report', 'high', 'Work').then(t => console.log('Created:', t.id));`;
+
+    // Python snippets
+    $('#snip-py-get').textContent =
+`import requests
+
+BASE = '${base}'
+PASSWORD = '${pw}'
+
+def get_tasks():
+    r = requests.get(
+        f'{BASE}/api/tasks',
+        headers={'X-Todo-Password': PASSWORD}
+    )
+    r.raise_for_status()
+    return r.json()['tasks']  # list of dicts
+
+tasks = get_tasks()
+for t in tasks:
+    status = '✓' if t['completed'] else '○'
+    print(f"{status} [{t['priority']}] {t['title']}")`;
+
+    $('#snip-py-add').textContent =
+`import requests, time, random, string
+
+BASE = '${base}'
+PASSWORD = '${pw}'
+
+def add_task(title, priority='medium', category='Work', due_date=None):
+    # Fetch current list
+    data = requests.get(f'{BASE}/api/tasks',
+                        headers={'X-Todo-Password': PASSWORD}).json()
+    tasks = data.get('tasks') or []
+
+    # Build new task
+    new_id = hex(int(time.time() * 1000))[2:] + ''.join(
+        random.choices(string.ascii_lowercase, k=5))
+    task = {
+        'id': new_id,
+        'title': title,
+        'completed': False,
+        'priority': priority,
+        'category': category,
+        'createdAt': int(time.time() * 1000)
+    }
+    if due_date:
+        task['dueDate'] = due_date  # 'YYYY-MM-DD'
+    tasks.append(task)
+
+    # Push
+    r = requests.put(f'{BASE}/api/tasks',
+                     json={'updatedAt': int(time.time() * 1000), 'tasks': tasks},
+                     headers={'X-Todo-Password': PASSWORD,
+                              'Content-Type': 'application/json'})
+    r.raise_for_status()
+    return task
+
+t = add_task('Deploy to production', priority='high', due_date='2026-11-15')
+print('Created task:', t['id'])`;
+
+    // cURL snippets
+    $('#snip-curl-get').textContent =
+`# Get all tasks
+curl -s "${base}/api/tasks" \\
+  -H "X-Todo-Password: ${pw}" | python3 -m json.tool`;
+
+    $('#snip-curl-add').textContent =
+`# Note: this replaces the ENTIRE task list.
+# Fetch current tasks first, then PUT the modified array.
+
+TASKS=$(curl -s "${base}/api/tasks" \\
+  -H "X-Todo-Password: ${pw}" | jq '.tasks')
+
+curl -s -X PUT "${base}/api/tasks" \\
+  -H "Content-Type: application/json" \\
+  -H "X-Todo-Password: ${pw}" \\
+  -d "$(jq -n \\
+    --argjson tasks "$TASKS" \\
+    --argjson ts $(date +%s)000 \\
+    '{updatedAt: $ts, tasks: ($tasks + [{id: "new1", title: "Shell task", completed: false, priority: "low", createdAt: $ts}])}'\\
+  )"`;
+
+    // Node.js full helper
+    $('#snip-node-full').textContent =
+`// taskctl-client.js  —  drop-in helper for Node.js ≥ 18
+// npm install  (no deps needed — uses built-in fetch)
+
+const BASE = '${base}';
+const PASSWORD = process.env.TASKCTL_PASSWORD || '${pw}';
+
+const headers = () => ({
+  'Content-Type': 'application/json',
+  'X-Todo-Password': PASSWORD,
+  Accept: 'application/json'
+});
+
+export async function listTasks() {
+  const r = await fetch(BASE + '/api/tasks', { headers: headers() });
+  if (!r.ok) throw new Error(await r.text());
+  const { tasks } = await r.json();
+  return tasks || [];
+}
+
+export async function addTask({ title, priority = 'medium', category = '', dueDate }) {
+  const tasks = await listTasks();
+  const task = {
+    id: Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    title, priority, category, completed: false, createdAt: Date.now(),
+    ...(dueDate ? { dueDate } : {})
+  };
+  tasks.push(task);
+  await putTasks(tasks);
+  return task;
+}
+
+export async function completeTask(id) {
+  const tasks = await listTasks();
+  const t = tasks.find(x => x.id === id);
+  if (!t) throw new Error('Task not found: ' + id);
+  t.completed = true;
+  await putTasks(tasks);
+  return t;
+}
+
+export async function deleteTask(id) {
+  const tasks = (await listTasks()).filter(x => x.id !== id);
+  await putTasks(tasks);
+}
+
+async function putTasks(tasks) {
+  const r = await fetch(BASE + '/api/tasks', {
+    method: 'PUT',
+    headers: headers(),
+    body: JSON.stringify({ updatedAt: Date.now(), tasks })
+  });
+  if (!r.ok) throw new Error(await r.text());
+}
+
+// Quick demo
+(async () => {
+  const t = await addTask({ title: 'Task from Node.js', priority: 'high', dueDate: '2026-11-15' });
+  console.log('Created:', t.id, t.title);
+  const all = await listTasks();
+  console.log('Total tasks:', all.length);
+})();`;
+  }
+
+  /* ── render keys list ── */
+  function renderKeys() {
+    const keys = loadKeys();
+    const list = $('#keysList');
+    if (!keys.length) {
+      list.innerHTML = '<div class="empty-keys">No API keys yet.<br>Generate one above to get started.</div>';
+      return;
+    }
+    list.innerHTML = keys.map((k, i) => `
+      <div class="key-row" data-ki="${i}">
+        <div class="key-row-info">
+          <div class="key-name">${esc(k.name)}</div>
+          <div class="key-val" title="Click to reveal" data-reveal="${i}">•••• •••• •••• ••••</div>
+          <div class="key-meta">Created ${new Date(k.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</div>
+        </div>
+        <div class="key-actions">
+          <button class="copy" data-copy-key="${i}" title="Copy key">📋 Copy</button>
+          <button data-toggle-key="${i}" title="Show/hide">👁 Show</button>
+          <button class="danger" data-del-key="${i}" title="Revoke key">🗑 Revoke</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  /* ── open / close ── */
+  function openPortal() {
+    $('#apiOverlay').classList.add('open');
+    $('#apiOverlay').removeAttribute('aria-hidden');
+    $('#apiDrawer').classList.add('open');
+    $('#apiDrawer').removeAttribute('aria-hidden');
+    populateSnippets();
+    renderKeys();
+    document.body.style.overflow = 'hidden';
+  }
+  function closePortal() {
+    $('#apiOverlay').classList.remove('open');
+    $('#apiOverlay').setAttribute('aria-hidden', 'true');
+    $('#apiDrawer').classList.remove('open');
+    $('#apiDrawer').setAttribute('aria-hidden', 'true');
+    document.body.style.overflow = '';
+  }
+
+  $('#apiPortalBtn').addEventListener('click', openPortal);
+  $('#apiDrawerClose').addEventListener('click', closePortal);
+  $('#apiOverlay').addEventListener('click', closePortal);
+
+  /* ── tab switching ── */
+  document.querySelectorAll('.api-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.api-tab').forEach(t => t.setAttribute('aria-selected', 'false'));
+      document.querySelectorAll('.api-section').forEach(s => s.classList.remove('active'));
+      tab.setAttribute('aria-selected', 'true');
+      $('#sec-' + tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  /* ── snippet language tabs ── */
+  document.querySelectorAll('.snippet-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.snippet-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.snippet-panel').forEach(p => p.classList.remove('active'));
+      tab.classList.add('active');
+      $('#snip-' + tab.dataset.snip).classList.add('active');
+    });
+  });
+
+  /* ── endpoint accordion ── */
+  document.querySelectorAll('.ep-head').forEach(head => {
+    head.addEventListener('click', () => {
+      const body = $('#ep-' + head.dataset.ep);
+      if (body) body.classList.toggle('open');
+    });
+  });
+
+  /* ── copy buttons (delegated on the drawer) ── */
+  $('#apiDrawer').addEventListener('click', e => {
+    const btn = e.target.closest('.copy-btn');
+    if (!btn) return;
+    if (btn.dataset.copyId) {
+      const pre = $('#' + btn.dataset.copyId);
+      if (pre) copyText(pre.textContent, btn);
+    } else if (btn.dataset.copyPrev !== undefined) {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      if (pre) copyText(pre.textContent, btn);
+    }
+  });
+
+  /* ── keys tab events (delegated) ── */
+  $('#keysList').addEventListener('click', e => {
+    // copy key
+    const copyBtn = e.target.closest('[data-copy-key]');
+    if (copyBtn) {
+      const idx = Number(copyBtn.dataset.copyKey);
+      const keys = loadKeys();
+      if (keys[idx]) copyText(keys[idx].value, copyBtn);
+      return;
+    }
+    // show / hide
+    const toggleBtn = e.target.closest('[data-toggle-key]');
+    if (toggleBtn) {
+      const idx = Number(toggleBtn.dataset.toggleKey);
+      const keys = loadKeys();
+      if (!keys[idx]) return;
+      const valEl = $('#keysList').querySelector(`[data-reveal="${idx}"]`);
+      if (valEl.classList.contains('revealed')) {
+        valEl.textContent = '•••• •••• •••• ••••';
+        valEl.classList.remove('revealed');
+        toggleBtn.textContent = '👁 Show';
+      } else {
+        valEl.textContent = keys[idx].value;
+        valEl.classList.add('revealed');
+        toggleBtn.textContent = '🙈 Hide';
+      }
+      return;
+    }
+    // revoke / delete
+    const delBtn = e.target.closest('[data-del-key]');
+    if (delBtn) {
+      const idx = Number(delBtn.dataset.delKey);
+      const keys = loadKeys();
+      if (!keys[idx]) return;
+      if (!confirm(`Revoke key "${keys[idx].name}"? This cannot be undone.`)) return;
+      keys.splice(idx, 1);
+      saveKeys(keys);
+      renderKeys();
+    }
+  });
+
+  /* ── generate new key ── */
+  $('#genKeyBtn').addEventListener('click', () => {
+    const nameInput = $('#newKeyName');
+    const name = nameInput.value.trim();
+    if (!name) { nameInput.focus(); return; }
+    const keys = loadKeys();
+    keys.push({ name, value: genToken(), createdAt: Date.now() });
+    saveKeys(keys);
+    nameInput.value = '';
+    renderKeys();
+    toast(`🔑 Key "${name}" generated`);
+  });
+
+  $('#newKeyName').addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); $('#genKeyBtn').click(); }
+  });
+
+  /* ── close on Escape ── */
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && $('#apiDrawer').classList.contains('open')) closePortal();
+  });
+})();
 </script>
 </body>
 </html>
